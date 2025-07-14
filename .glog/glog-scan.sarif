@@ -1,0 +1,2568 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Glog.AI",
+          "organization": "Glog.AI",
+          "fullName": "Glog, Making software more secure",
+          "version": "1.0.0",
+          "semanticVersion": "1.0.0",
+          "informationUri": "https://www.glog.ai",
+          "rules": [
+            {
+              "id": "glog-0cb07281-0a6e-4dc5-8cfe-6e710a11ec60",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe \"Detection of exec Usage\" vulnerability in Python arises when the `exec()` function is used to execute dynamically constructed Python code. This can lead to security risks, especially if the input to `exec()` is not properly sanitized, as it may allow an attacker to execute arbitrary code. The specific vulnerability sink `exec(next_arg)` indicates that the `next_arg` variable is being executed without validation, which could be exploited if `next_arg` contains malicious code.\n\n### General Mitigation Advice\n\n1. **Avoid Using `exec()`**: If possible, refactor the code to avoid using `exec()`. Consider using safer alternatives like functions, classes, or other Python constructs that do not require dynamic code execution.\n\n2. **Input Validation**: If `exec()` must be used, ensure that the input is strictly validated. Only allow known safe inputs and reject any input that could be potentially harmful.\n\n3. **Use Restricted Execution Environments**: Consider using libraries or frameworks that provide a restricted execution environment to limit what the executed code can do.\n\n4. **Logging and Monitoring**: Implement logging and monitoring to detect any unusual activity that might indicate an exploitation attempt.\n\n### Source Code Fix Recommendation\n\nTo mitigate the vulnerability in the specific code example, you can refactor the code to avoid using `exec()`. Here's an example of how you might do this:\n\n```python\n# Original vulnerable code\n# exec(next_arg)\n\n# Refactored code without exec()\ndef execute_command(command):\n    if command == \"safe_command\":\n        # Execute the safe command\n        print(\"Executing safe command\")\n    else:\n        raise ValueError(\"Unsafe command detected\")\n\n# Example usage\nnext_arg = \"safe_command\"  # This should be a validated input\nexecute_command(next_arg)\n```\n\n### Library Dependencies\n\nThe provided code example does not require any additional library dependencies to execute properly.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-94: Improper Control of Generation of Code ('Code Injection')](https://cwe.mitre.org/data/definitions/94.html)"
+              },
+              "properties": {
+                "tags": [
+                  "B102"
+                ]
+              }
+            },
+            {
+              "id": "glog-6307ba0b-43da-4930-ad63-60820983699f",
+              "help": {
+                "text": "",
+                "markdown": "### Description of \"Detection of exec Usage\" Vulnerability\n\nThe `exec()` function in Python is used to execute dynamically created Python code, which can be a string or object code. While powerful, its use can lead to significant security vulnerabilities if not handled properly. The primary risk associated with `exec()` is the potential for code injection attacks, where an attacker can execute arbitrary code within the context of the application. This can lead to unauthorized access, data leakage, or even complete system compromise.\n\n### General Mitigation Advice\n\n1. **Avoid Using `exec()`**: The best way to mitigate the risks associated with `exec()` is to avoid using it altogether. Consider alternative approaches that do not require dynamic code execution.\n\n2. **Input Validation and Sanitization**: If `exec()` must be used, ensure that all inputs are thoroughly validated and sanitized to prevent injection of malicious code.\n\n3. **Use Restricted Execution Environments**: If possible, execute code in a restricted environment where the potential damage of executing arbitrary code is minimized.\n\n4. **Limit Scope and Permissions**: Restrict the scope and permissions of the code being executed to the bare minimum necessary for functionality.\n\n5. **Logging and Monitoring**: Implement logging and monitoring to detect any unusual or unauthorized use of `exec()`.\n\n### Source Code Fix Recommendation\n\nIf you have a code snippet that uses `exec()`, consider the following example for a safer alternative:\n\n```python\n# Original code using exec()\nuser_input = \"print('Hello, World!')\"\nexec(user_input)\n\n# Safer alternative using a dictionary for controlled execution\nallowed_functions = {\n    'print': print\n}\n\nuser_input = \"print('Hello, World!')\"\nexec(user_input, {\"__builtins__\": None}, allowed_functions)\n```\n\nIn this example, the use of `exec()` is restricted by providing a controlled environment where only specific functions are allowed to be executed.\n\n### Library Dependencies\n\nThe above code example does not require any additional library dependencies beyond the Python standard library.\n\n### Relevant OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-94: Improper Control of Generation of Code ('Code Injection')](https://cwe.mitre.org/data/definitions/94.html)"
+              },
+              "properties": {
+                "tags": [
+                  "B102"
+                ]
+              }
+            },
+            {
+              "id": "glog-fcf757a5-c78c-477f-b2bc-61a932f1847f",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe vulnerability \"An Insecure Cipher Mode of Operation Was Utilized\" in C++ refers to the use of cryptographic algorithms in a mode that does not provide adequate security guarantees. In particular, using a non-authenticated encryption mode can lead to vulnerabilities such as replay attacks, tampering, and other forms of cryptographic attacks. AEAD (Authenticated Encryption with Associated Data) modes, such as GCM (Galois/Counter Mode) or CCM (Counter with CBC-MAC), are recommended to ensure both confidentiality and integrity of the data.\n\n### General Mitigation Advice\n\n1. **Use AEAD Modes**: Always use authenticated encryption modes like AES-GCM or AES-CCM to ensure both confidentiality and integrity.\n2. **Avoid ECB Mode**: Never use ECB (Electronic Codebook) mode as it is insecure for most applications.\n3. **Use Strong Keys**: Ensure that cryptographic keys are generated securely and have sufficient entropy.\n4. **Keep Libraries Updated**: Use the latest versions of cryptographic libraries to benefit from security patches and improvements.\n\n### Source Code Fix Recommendation\n\nBelow is an example of how to use AES-GCM in C++ using the OpenSSL library:\n\n```cpp\n#include <openssl/evp.h>\n#include <openssl/rand.h>\n#include <iostream>\n#include <vector>\n\nbool encrypt(const std::vector<unsigned char>& plaintext, const std::vector<unsigned char>& key,\n             const std::vector<unsigned char>& iv, std::vector<unsigned char>& ciphertext,\n             std::vector<unsigned char>& tag) {\n    EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();\n    if (!ctx) return false;\n\n    if (EVP_EncryptInit_ex(ctx, EVP_aes_256_gcm(), NULL, NULL, NULL) != 1) {\n        EVP_CIPHER_CTX_free(ctx);\n        return false;\n    }\n\n    if (EVP_EncryptInit_ex(ctx, NULL, NULL, key.data(), iv.data()) != 1) {\n        EVP_CIPHER_CTX_free(ctx);\n        return false;\n    }\n\n    int len;\n    ciphertext.resize(plaintext.size());\n    if (EVP_EncryptUpdate(ctx, ciphertext.data(), &len, plaintext.data(), plaintext.size()) != 1) {\n        EVP_CIPHER_CTX_free(ctx);\n        return false;\n    }\n\n    int ciphertext_len = len;\n    if (EVP_EncryptFinal_ex(ctx, ciphertext.data() + len, &len) != 1) {\n        EVP_CIPHER_CTX_free(ctx);\n        return false;\n    }\n    ciphertext_len += len;\n\n    ciphertext.resize(ciphertext_len);\n    tag.resize(16);\n    if (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, 16, tag.data()) != 1) {\n        EVP_CIPHER_CTX_free(ctx);\n        return false;\n    }\n\n    EVP_CIPHER_CTX_free(ctx);\n    return true;\n}\n\nint main() {\n    std::vector<unsigned char> key(32); // 256-bit key\n    std::vector<unsigned char> iv(12);  // 96-bit IV\n    std::vector<unsigned char> plaintext = {'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd'};\n    std::vector<unsigned char> ciphertext;\n    std::vector<unsigned char> tag;\n\n    if (!RAND_bytes(key.data(), key.size()) || !RAND_bytes(iv.data(), iv.size())) {\n        std::cerr << \"Error generating random bytes for key/iv\" << std::endl;\n        return 1;\n    }\n\n    if (encrypt(plaintext, key, iv, ciphertext, tag)) {\n        std::cout << \"Encryption successful!\" << std::endl;\n    } else {\n        std::cerr << \"Encryption failed!\" << std::endl;\n    }\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- OpenSSL\n\nTo compile the above code, you need to link against the OpenSSL library. You can do this by using the following command:\n\n```bash\ng++ -o encrypt_example encrypt_example.cpp -lssl -lcrypto\n```\n\n### Relevant Links\n\n- [OWASP Cryptographic Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html)\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [CWE-327: Use of a Broken or Risky Cryptographic Algorithm](https://cwe.mitre.org/data/definitions/327.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS187371"
+                ]
+              }
+            },
+            {
+              "id": "glog-c63b9801-4186-4b60-9e53-caf7a15e5106",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe vulnerability \"An Insecure Cipher Mode of Operation Was Utilized\" in C++ refers to the use of cryptographic algorithms in a mode that does not provide adequate security guarantees. In particular, using a non-authenticated encryption mode can lead to vulnerabilities such as replay attacks, tampering, and other forms of cryptographic attacks. AEAD (Authenticated Encryption with Associated Data) modes, such as GCM (Galois/Counter Mode) or CCM (Counter with CBC-MAC), are recommended to ensure both confidentiality and integrity of the data.\n\n### General Mitigation Advice\n\n1. **Use AEAD Modes**: Always use authenticated encryption modes like AES-GCM or AES-CCM to ensure both confidentiality and integrity.\n2. **Avoid ECB Mode**: Never use ECB (Electronic Codebook) mode as it is insecure for most applications.\n3. **Use Strong Keys**: Ensure that cryptographic keys are generated securely and have sufficient entropy.\n4. **Keep Libraries Updated**: Use the latest versions of cryptographic libraries to benefit from security patches and improvements.\n\n### Source Code Fix Recommendation\n\nBelow is an example of how to use AES-GCM in C++ using the OpenSSL library:\n\n```cpp\n#include <openssl/evp.h>\n#include <openssl/rand.h>\n#include <iostream>\n#include <vector>\n\nbool encrypt(const std::vector<unsigned char>& plaintext, const std::vector<unsigned char>& key,\n             const std::vector<unsigned char>& iv, std::vector<unsigned char>& ciphertext,\n             std::vector<unsigned char>& tag) {\n    EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();\n    if (!ctx) return false;\n\n    if (EVP_EncryptInit_ex(ctx, EVP_aes_256_gcm(), NULL, NULL, NULL) != 1) {\n        EVP_CIPHER_CTX_free(ctx);\n        return false;\n    }\n\n    if (EVP_EncryptInit_ex(ctx, NULL, NULL, key.data(), iv.data()) != 1) {\n        EVP_CIPHER_CTX_free(ctx);\n        return false;\n    }\n\n    int len;\n    ciphertext.resize(plaintext.size());\n    if (EVP_EncryptUpdate(ctx, ciphertext.data(), &len, plaintext.data(), plaintext.size()) != 1) {\n        EVP_CIPHER_CTX_free(ctx);\n        return false;\n    }\n\n    int ciphertext_len = len;\n    if (EVP_EncryptFinal_ex(ctx, ciphertext.data() + len, &len) != 1) {\n        EVP_CIPHER_CTX_free(ctx);\n        return false;\n    }\n    ciphertext_len += len;\n\n    ciphertext.resize(ciphertext_len);\n    tag.resize(16);\n    if (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, 16, tag.data()) != 1) {\n        EVP_CIPHER_CTX_free(ctx);\n        return false;\n    }\n\n    EVP_CIPHER_CTX_free(ctx);\n    return true;\n}\n\nint main() {\n    std::vector<unsigned char> key(32); // 256-bit key\n    std::vector<unsigned char> iv(12);  // 96-bit IV\n    std::vector<unsigned char> plaintext = {'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd'};\n    std::vector<unsigned char> ciphertext;\n    std::vector<unsigned char> tag;\n\n    if (!RAND_bytes(key.data(), key.size()) || !RAND_bytes(iv.data(), iv.size())) {\n        std::cerr << \"Error generating random bytes for key/iv\" << std::endl;\n        return 1;\n    }\n\n    if (encrypt(plaintext, key, iv, ciphertext, tag)) {\n        std::cout << \"Encryption successful!\" << std::endl;\n    } else {\n        std::cerr << \"Encryption failed!\" << std::endl;\n    }\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- OpenSSL\n\nTo compile the above code, you need to link against the OpenSSL library. You can do this by using the following command:\n\n```bash\ng++ -o encrypt_example encrypt_example.cpp -lssl -lcrypto\n```\n\n### Relevant Links\n\n- [OWASP Cryptographic Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html)\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [CWE-327: Use of a Broken or Risky Cryptographic Algorithm](https://cwe.mitre.org/data/definitions/327.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS187371"
+                ]
+              }
+            },
+            {
+              "id": "glog-58c1fd17-fd64-45f8-951e-e7b14fc95bbe",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe \"Detected Issue with C Function (memcpy)\" vulnerability in C++ arises when the `memcpy` function is used improperly, potentially leading to buffer overflows or memory corruption. This can occur if the source or destination buffers are not properly sized or if the length of data to be copied exceeds the size of the destination buffer. In the given code snippet, `memcpy(iv, data.m_tag, 16)`, the vulnerability may occur if `iv` is not at least 16 bytes in size, leading to potential overwriting of adjacent memory.\n\n### General Mitigation Advice\n\n1. **Ensure Proper Buffer Sizes**: Always ensure that the destination buffer is large enough to hold the data being copied.\n2. **Use Safer Alternatives**: Consider using safer alternatives like `std::copy` or `std::memmove` which provide better type safety and can handle overlapping memory regions.\n3. **Boundary Checks**: Implement boundary checks to ensure that the size of the data being copied does not exceed the size of the destination buffer.\n4. **Static Analysis Tools**: Use static analysis tools to detect potential buffer overflows and other memory issues in your code.\n\n### Source Code Fix Recommendation\n\nTo fix the specific vulnerability in the code snippet, ensure that the destination buffer `iv` is properly sized and consider using `std::copy` for better safety:\n\n```cpp\n#include <algorithm> // for std::copy\n#include <cstring>   // for std::memcpy\n\n// Assuming iv is a char array with at least 16 bytes\nchar iv[16];\nstd::copy(data.m_tag, data.m_tag + 16, iv);\n```\n\n### Library Dependencies\n\nTo execute the code example properly, the following library dependencies are required:\n\n- `<algorithm>`: Required for `std::copy`.\n- `<cstring>`: Required if `memcpy` is used.\n\n### Relevant Resources\n\n- [OWASP Buffer Overflow](https://owasp.org/www-community/vulnerabilities/Buffer_Overflow)\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)\n\nThese links are valid and accessible for anonymous users."
+              },
+              "properties": {
+                "tags": [
+                  "DS121708"
+                ]
+              }
+            },
+            {
+              "id": "glog-96fd5d67-c741-4a78-9972-bdc72f7d5d65",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe \"Detected Issue with C Function (malloc)\" vulnerability in C++ typically arises from improper handling of memory allocation, which can lead to memory leaks, buffer overflows, or undefined behavior. In the context of the function `malloc(alcp_drbg_context_size(&drbg_info))`, the vulnerability may occur if the size calculated by `alcp_drbg_context_size(&drbg_info)` is incorrect, leading to insufficient memory allocation. This can result in writing beyond the allocated memory, causing potential security risks such as data corruption or application crashes.\n\n### General Mitigation Advice\n\n1. **Validate Input:** Ensure that the input to `alcp_drbg_context_size` is validated and sanitized to prevent incorrect size calculations.\n2. **Check Return Values:** Always check the return value of `malloc` to ensure that memory allocation was successful.\n3. **Use Safe Functions:** Consider using safer alternatives or wrappers that include bounds checking.\n4. **Free Allocated Memory:** Ensure that all allocated memory is properly freed to prevent memory leaks.\n5. **Use Smart Pointers:** In C++, prefer using smart pointers (e.g., `std::unique_ptr`, `std::shared_ptr`) to manage memory automatically.\n\n### Source Code Fix Recommendation\n\n```cpp\n#include <iostream>\n#include <cstdlib> // for malloc and free\n#include <stdexcept> // for std::runtime_error\n\n// Assume alcp_drbg_context_size is defined elsewhere\nextern size_t alcp_drbg_context_size(void* drbg_info);\n\nvoid* allocate_drbg_context(void* drbg_info) {\n    size_t size = alcp_drbg_context_size(drbg_info);\n    if (size == 0) {\n        throw std::runtime_error(\"Invalid size for DRBG context\");\n    }\n\n    void* context = malloc(size);\n    if (!context) {\n        throw std::runtime_error(\"Memory allocation failed\");\n    }\n\n    return context;\n}\n\nint main() {\n    void* drbg_info = nullptr; // Initialize appropriately\n    try {\n        void* context = allocate_drbg_context(drbg_info);\n        // Use the context\n        // ...\n\n        // Free the allocated memory\n        free(context);\n    } catch (const std::exception& e) {\n        std::cerr << \"Error: \" << e.what() << std::endl;\n    }\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- `<cstdlib>`: Required for `malloc` and `free`.\n- `<stdexcept>`: Required for `std::runtime_error`.\n- `<iostream>`: Required for input/output operations.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)\n- [CWE-401: Missing Release of Memory after Effective Lifetime](https://cwe.mitre.org/data/definitions/401.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS161085"
+                ]
+              }
+            },
+            {
+              "id": "glog-f5dbb084-8a84-43ad-887f-0d01fd2733a8",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe vulnerability associated with the `strlen` function in C++ arises from its inability to handle non-null-terminated strings. The `strlen` function calculates the length of a string by iterating through the characters until it encounters a null terminator (`'\\0'`). If the string is not properly null-terminated, `strlen` will continue reading beyond the intended buffer, potentially leading to undefined behavior, memory access violations, or information disclosure.\n\n### General Mitigation Advice\n\n1. **Ensure Proper Null-Termination**: Always ensure that strings are null-terminated before passing them to `strlen`.\n2. **Use Safer Alternatives**: Consider using safer string handling functions or libraries that manage string lengths explicitly, such as `std::string` in C++.\n3. **Bounds Checking**: Implement bounds checking to ensure that buffer overflows do not occur.\n4. **Static Analysis Tools**: Use static analysis tools to detect potential vulnerabilities in the code.\n\n### Source Code Fix Recommendation\n\nTo mitigate the risk associated with `strlen`, ensure that the input string is properly null-terminated. Alternatively, use `std::string` which manages its own length and is safer to use.\n\n#### Vulnerable Code Example\n\n```cpp\n#include <cstring>\n\nvoid processString(const char* input) {\n    size_t length = strlen(input); // Potential vulnerability if input is not null-terminated\n    // Further processing...\n}\n```\n\n#### Fixed Code Example\n\n```cpp\n#include <string>\n\nvoid processString(const std::string& input) {\n    size_t length = input.length(); // Safe usage with std::string\n    // Further processing...\n}\n```\n\n### Library Dependencies\n\nFor the fixed code example using `std::string`, the following library is required:\n\n- `<string>`: Provides the `std::string` class.\n\n### Relevant Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n\n### Common Weakness Enumeration\n\n- [CWE-170: Improper Null Termination](https://cwe.mitre.org/data/definitions/170.html)\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS140021"
+                ]
+              }
+            },
+            {
+              "id": "glog-1db0cc19-cb9e-49db-8eb5-a325c21f40c1",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract sensitive information. Hardcoding sensitive data like API keys, tokens, or passwords in the source code increases the risk of data breaches and unauthorized access to systems.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and manage sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure that only authorized personnel can access sensitive information.\n5. **Encryption**: Encrypt sensitive data both at rest and in transit to protect it from unauthorized access.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid storing tokens or keys directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    \n    if (token == nullptr) {\n        std::cerr << \"Error: Environment variable MY_SECRET_TOKEN is not set.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code example does not require any additional library dependencies beyond the C++ Standard Library to execute properly.\n\n### Relevant Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n- [Common Weakness Enumeration: CWE-798 - Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-1622ca1e-b9a9-46f7-a44d-2ff602e4ac3c",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nIn C++ programming, storing sensitive information such as tokens or keys directly in the source code is a common vulnerability. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these credentials. This vulnerability is particularly dangerous in environments where the source code is shared or stored in version control systems.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in the source code repository. Ensure these files are encrypted or access-controlled.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Control**: Limit access to the source code and ensure that only authorized personnel can view or modify it.\n5. **Code Reviews**: Conduct regular code reviews to ensure that sensitive information is not being stored in the source code.\n\n### Source Code Fix Recommendation\n\n#### Vulnerable Code Example\n\n```cpp\n#include <iostream>\n\nint main() {\n    // Vulnerable: Hardcoded API key\n    std::string apiKey = \"986a078b5a8300fc48cc5459e9a8e61692bb6679d61f3a91725b6ede2e49396559fe\";\n    std::cout << \"API Key: \" << apiKey << std::endl;\n    return 0;\n}\n```\n\n#### Fixed Code Example\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Mitigation: Retrieve API key from environment variable\n    const char* apiKey = std::getenv(\"API_KEY\");\n    if (apiKey == nullptr) {\n        std::cerr << \"Error: API key not set in environment variables.\" << std::endl;\n        return 1;\n    }\n    std::cout << \"API Key: \" << apiKey << std::endl;\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe code example provided does not require any additional library dependencies beyond the standard C++ library.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-c914b972-e844-4496-8248-a5721ace312f",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nEmbedding tokens or keys directly in source code is a common security vulnerability in C++ programming and other languages. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these sensitive values. Hardcoded tokens or keys can be inadvertently exposed through version control systems, shared code repositories, or even through reverse engineering of compiled binaries.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information like tokens or keys in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in the source code repository to store sensitive information. Ensure these files are properly secured and access-controlled.\n3. **Secrets Management Tools**: Utilize secrets management tools such as HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and manage sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure that only authorized personnel can access sensitive information.\n5. **Encryption**: Encrypt sensitive data both at rest and in transit to add an additional layer of security.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example that demonstrates how to avoid embedding a token directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECURE_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Token not found. Please set the MY_SECURE_TOKEN environment variable.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    // Rest of the application logic\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code example does not require any additional library dependencies beyond the standard C++ library.\n\n### Relevant Resources\n\n- [OWASP Cheat Sheet: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n- [OWASP Top Ten: A2:2017-Broken Authentication](https://owasp.org/www-project-top-ten/2017/A2_2017-Broken_Authentication)\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-575cdebe-133d-4739-aa32-905773113063",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract sensitive information such as API keys, encryption keys, or tokens. This vulnerability can lead to data breaches, unauthorized transactions, or other malicious activities.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure that only authorized personnel can access sensitive information.\n5. **Encryption**: Encrypt sensitive data both at rest and in transit to add an additional layer of security.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid storing tokens or keys directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECURE_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Token not found. Please set the MY_SECURE_TOKEN environment variable.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n    // Proceed with using the token securely...\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code does not require any additional library dependencies beyond the standard C++ library.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-4399d020-3c02-41d4-bbc0-1a379690912c",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract sensitive information such as API keys, encryption keys, or tokens. This vulnerability can result in data breaches, unauthorized transactions, or other malicious activities.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure that only authorized personnel can access sensitive information.\n5. **Encryption**: Encrypt sensitive data both at rest and in transit to add an additional layer of security.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid storing tokens or keys directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    \n    if (token == nullptr) {\n        std::cerr << \"Error: MY_SECRET_TOKEN environment variable is not set.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code does not require any additional library dependencies beyond the C++ Standard Library.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-f20c6a55-04ca-482c-8466-d43342db4a17",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nIn C++ programming, storing sensitive information such as tokens or keys directly in the source code is a common vulnerability. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these credentials. This vulnerability is particularly dangerous in environments where the source code is shared or stored in version control systems, as it increases the risk of accidental exposure.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in the source code repository. Ensure these files are encrypted or access-controlled.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure only authorized personnel can access sensitive information.\n5. **Code Reviews**: Conduct regular code reviews to identify and remove any hardcoded sensitive information.\n\n### Source Code Fix Recommendation\n\n#### Vulnerable Code Example\n\n```cpp\n#include <iostream>\n\nint main() {\n    // Vulnerable: Hardcoded API token\n    std::string apiToken = \"22ed07124109dabb97c71595993b089ef42dd04603d9f7ffc455cadb8ca1\";\n    std::cout << \"API Token: \" << apiToken << std::endl;\n    return 0;\n}\n```\n\n#### Fixed Code Example\n\n```cpp\n#include <iostream>\n#include <cstdlib> // Required for getenv\n\nint main() {\n    // Mitigation: Retrieve API token from environment variable\n    const char* apiToken = std::getenv(\"API_TOKEN\");\n    if (apiToken == nullptr) {\n        std::cerr << \"Error: API token not set in environment variables.\" << std::endl;\n        return 1;\n    }\n    std::cout << \"API Token: \" << apiToken << std::endl;\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ library (`cstdlib` for `getenv` function)\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-719f387d-8cf8-4178-9ef9-7f0edb33fcd8",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nIn C++ programming, storing sensitive information such as tokens or keys directly in the source code is a common vulnerability. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these secrets. This vulnerability is particularly dangerous in environments where the source code is shared or stored in version control systems.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in the source code repository to store sensitive data. Ensure these files are encrypted or access-controlled.\n3. **Secret Management Tools**: Utilize secret management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure that only authorized personnel can access sensitive information.\n5. **Code Reviews**: Conduct regular code reviews to identify and remove any hardcoded secrets.\n\n### Source Code Fix Recommendation\n\nBelow is an example of how to refactor code to avoid storing tokens or keys directly in the source code:\n\n```cpp\n#include <iostream>\n#include <cstdlib> // Required for getenv\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: MY_SECRET_TOKEN environment variable not set.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ Library (no additional dependencies required for the example provided).\n\n### Relevant Resources\n\n- [OWASP Cheat Sheet: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n- [OWASP Top Ten: A6:2017-Security Misconfiguration](https://owasp.org/www-project-top-ten/2017/A6_2017-Security_Misconfiguration)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-47634c0c-c1b9-456d-9bf8-02bfee80da04",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nEmbedding tokens or keys directly in source code is a security vulnerability that can lead to unauthorized access and data breaches. In C++ programming, this practice exposes sensitive information, such as API keys, encryption keys, or passwords, to anyone who has access to the source code. This can happen through version control systems, code sharing, or even reverse engineering of compiled binaries.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control to store sensitive data.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Control**: Limit access to the source code and ensure that only authorized personnel can view or modify it.\n5. **Code Reviews**: Conduct regular code reviews to ensure that no sensitive information is embedded in the source code.\n\n### Source Code Fix Recommendation\n\n#### Vulnerable Code Example\n\n```cpp\n#include <iostream>\n\nint main() {\n    // Vulnerable: API key embedded in source code\n    std::string apiKey = \"04a371e84ecfb5b8b77cb48610fca8182dd457ce6f326a0fd3d7ec2f1e91636dee69\";\n    std::cout << \"API Key: \" << apiKey << std::endl;\n    return 0;\n}\n```\n\n#### Fixed Code Example\n\n```cpp\n#include <iostream>\n#include <cstdlib> // Required for getenv\n\nint main() {\n    // Mitigation: Retrieve API key from environment variable\n    const char* apiKey = std::getenv(\"API_KEY\");\n    if (apiKey == nullptr) {\n        std::cerr << \"Error: API_KEY environment variable not set.\" << std::endl;\n        return 1;\n    }\n    std::cout << \"API Key: \" << apiKey << std::endl;\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ Library (`cstdlib` for `getenv` function)\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-faf88cfb-ecda-4273-99a6-25ec604e6d2d",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nIn C++ programming, storing sensitive information such as tokens or keys directly in the source code is a common vulnerability. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these secrets. The hardcoded token \"456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\" is an example of such a vulnerability. \n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control to store sensitive data.\n3. **Secret Management Tools**: Utilize secret management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Encryption**: Encrypt sensitive data if it must be stored in a file or database.\n5. **Access Control**: Implement strict access control measures to limit who can view or modify sensitive information.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid storing a token directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib> // For getenv\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    \n    if (token == nullptr) {\n        std::cerr << \"Error: Token not found. Please set the MY_SECRET_TOKEN environment variable.\" << std::endl;\n        return 1;\n    }\n\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n    // Use the token securely in your application\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ Library (no additional dependencies required)\n\n### Relevant Links\n\n- [OWASP Cheat Sheet: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n- [OWASP Top Ten: A2:2017-Broken Authentication](https://owasp.org/www-project-top-ten/2017/A2_2017-Broken_Authentication)\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-3e5cdb95-f8f8-46b2-96a9-81dac2154d6b",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these sensitive values. Hardcoding such secrets makes it difficult to rotate keys and manage them securely, increasing the risk of data breaches.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information like tokens or keys in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secret Management Tools**: Utilize secret management tools such as HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Encryption**: Encrypt sensitive data if it must be stored in a file, ensuring that the decryption key is also stored securely.\n5. **Access Control**: Implement strict access control measures to limit who can view or modify the source code and configuration files.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid hardcoding a token by using an environment variable:\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Environment variable MY_SECRET_TOKEN is not set.\" << std::endl;\n        return 1;\n    }\n\n    std::cout << \"Token: \" << token << std::endl;\n    // Proceed with using the token securely\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ library (`cstdlib` and `iostream` are part of the standard library and do not require additional dependencies).\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-1a32ab43-2e60-4456-a215-0a0c380504b6",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nEmbedding tokens or keys directly in source code is a security vulnerability that can lead to unauthorized access and data breaches. In C++ programming, this practice exposes sensitive information to anyone who has access to the source code, including version control systems, which can be accessed by multiple developers or even become public accidentally. Attackers can exploit this vulnerability to gain unauthorized access to systems or data by extracting the embedded credentials.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information like tokens or keys in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control to store sensitive data. Ensure these files have appropriate access controls.\n3. **Secrets Management Tools**: Utilize secrets management tools such as HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Controls**: Implement strict access controls and audit logs to monitor who accesses sensitive information.\n5. **Encryption**: Encrypt sensitive data both at rest and in transit to add an additional layer of security.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid embedding tokens or keys directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECURE_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Token not found. Please set the MY_SECURE_TOKEN environment variable.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    // Rest of the application logic\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code example does not require any additional library dependencies beyond the C++ Standard Library to execute properly.\n\n### Relevant Resources\n\n- [OWASP Cheat Sheet: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n- [OWASP Top Ten: A3:2017-Sensitive Data Exposure](https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure)\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-296626df-0b09-4a03-b2a5-8bab37aafff9",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these sensitive credentials. This vulnerability can result in data breaches, unauthorized access to services, and other security incidents.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information like tokens or keys in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secret Management Tools**: Utilize secret management tools such as HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and manage sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure that only authorized personnel can access sensitive information.\n5. **Encryption**: Encrypt sensitive data both at rest and in transit to add an additional layer of security.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid storing tokens or keys directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    \n    if (token == nullptr) {\n        std::cerr << \"Error: MY_SECRET_TOKEN environment variable is not set.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    // Proceed with using the token securely\n    // ...\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code example does not require any additional library dependencies beyond the C++ Standard Library.\n\n### Relevant Resources\n\n- [OWASP Cheat Sheet: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n- [OWASP Top Ten: A3:2017-Sensitive Data Exposure](https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure)\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-b58239a7-d10e-41e7-86ca-c5db6c41a9c1",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these sensitive values. Hardcoding such secrets makes it difficult to rotate keys and manage them securely, increasing the risk of data breaches.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information like tokens or keys in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secret Management Tools**: Utilize secret management tools such as HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Encryption**: Encrypt sensitive data if it must be stored in a file, ensuring that the decryption key is also stored securely.\n5. **Access Control**: Implement strict access control measures to limit who can view or modify the source code and configuration files.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid hardcoding a token by using an environment variable:\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Environment variable MY_SECRET_TOKEN is not set.\" << std::endl;\n        return 1;\n    }\n\n    std::cout << \"Token: \" << token << std::endl;\n    // Proceed with using the token securely\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ library (`cstdlib` and `iostream` are part of the standard library and do not require additional dependencies).\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-0513a3f5-89b1-4893-be37-cf10923b5b58",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming and other languages. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract sensitive information such as API keys, encryption keys, or tokens. This vulnerability can lead to data breaches, unauthorized access to services, and other security incidents.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information like tokens or keys in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data. Ensure these files have appropriate access controls.\n3. **Secrets Management Tools**: Utilize secrets management tools such as HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and manage sensitive information.\n4. **Access Controls**: Implement strict access controls to ensure only authorized personnel can access sensitive information.\n5. **Code Reviews**: Conduct regular code reviews to identify and remove any hardcoded sensitive information.\n\n### Source Code Fix Recommendation\n\n#### Vulnerable Code Example\n\n```cpp\n#include <iostream>\n\nint main() {\n    // Vulnerable: Hardcoded API key\n    std::string apiKey = \"06099dbdb370f9b62adafaec759ea961609d737a5635b927343b53b12c93\";\n    std::cout << \"API Key: \" << apiKey << std::endl;\n    return 0;\n}\n```\n\n#### Fixed Code Example\n\n```cpp\n#include <iostream>\n#include <cstdlib> // Required for getenv\n\nint main() {\n    // Mitigation: Retrieve API key from environment variable\n    const char* apiKey = std::getenv(\"API_KEY\");\n    if (apiKey == nullptr) {\n        std::cerr << \"Error: API key not set in environment variables.\" << std::endl;\n        return 1;\n    }\n    std::cout << \"API Key: \" << apiKey << std::endl;\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ library (`cstdlib` for `getenv` function)\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-977275c3-df3f-4804-af07-765f8b9fb138",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these sensitive values. Hardcoding such secrets makes it difficult to rotate keys and manage them securely, increasing the risk of data breaches.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information like tokens or keys in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secret Management Tools**: Utilize secret management tools such as HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Encryption**: Encrypt sensitive data if it must be stored in a file, ensuring that the decryption key is also stored securely.\n5. **Access Control**: Implement strict access control measures to limit who can view or modify the source code and configuration files.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid hardcoding a token by using an environment variable:\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Environment variable MY_SECRET_TOKEN is not set.\" << std::endl;\n        return 1;\n    }\n\n    std::cout << \"Token: \" << token << std::endl;\n    // Proceed with using the token securely\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ library (`cstdlib` and `iostream` are part of the standard library and do not require additional dependencies).\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-77001a7b-da31-4cf3-8fdc-a1290cf570ca",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract sensitive information such as API keys, encryption keys, or tokens. This vulnerability can result in data breaches, unauthorized transactions, or other malicious activities.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure that only authorized personnel can access sensitive information.\n5. **Encryption**: Encrypt sensitive data both at rest and in transit to add an additional layer of security.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid storing tokens or keys directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    \n    if (token == nullptr) {\n        std::cerr << \"Error: MY_SECRET_TOKEN environment variable is not set.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code does not require any additional library dependencies beyond the standard C++ library.\n\n### Relevant Links\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n- [Common Weakness Enumeration (CWE-798)](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-107bb126-3249-4577-97c2-f6166075d1a6",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these sensitive values. Hardcoding such secrets makes it difficult to rotate keys and manage them securely, increasing the risk of data breaches.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information like tokens or keys in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secret Management Tools**: Utilize secret management tools such as HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Encryption**: Encrypt sensitive data if it must be stored in a file, ensuring that the decryption key is also stored securely.\n5. **Access Control**: Implement strict access control measures to limit who can view or modify the source code and configuration files.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid hardcoding a token by using an environment variable:\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Environment variable MY_SECRET_TOKEN is not set.\" << std::endl;\n        return 1;\n    }\n\n    std::cout << \"Token: \" << token << std::endl;\n    // Proceed with using the token securely\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ library (`cstdlib` and `iostream` are part of the standard library and do not require additional dependencies).\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-86fd7f80-95c7-436f-84c8-ed11649746f6",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these sensitive credentials. This vulnerability can result in data breaches, unauthorized access to services, and other security incidents.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information like tokens or keys in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secret Management Tools**: Utilize secret management tools such as HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and manage sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure that only authorized personnel can access sensitive information.\n5. **Encryption**: Encrypt sensitive data both at rest and in transit to add an additional layer of security.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid storing tokens or keys directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    \n    if (token == nullptr) {\n        std::cerr << \"Error: MY_SECRET_TOKEN environment variable is not set.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    // Proceed with using the token securely\n    // ...\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code example does not require any additional library dependencies beyond the C++ Standard Library.\n\n### Relevant Resources\n\n- [OWASP Cheat Sheet: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n- [OWASP Top Ten: A3:2017-Sensitive Data Exposure](https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure)\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-6ae8d9e6-a2fc-4865-ac85-032f5802bcee",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nEmbedding tokens or keys directly in source code is a security vulnerability that can lead to unauthorized access and data breaches. In C++ programming, this practice exposes sensitive information to anyone who has access to the source code, including version control systems, which can be accessed by multiple developers or even become public accidentally. Attackers can exploit this vulnerability to gain unauthorized access to systems or data by extracting the embedded credentials.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information like tokens or keys in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control to store sensitive data. Ensure these files have appropriate access controls.\n3. **Secrets Management Tools**: Utilize secrets management tools such as HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Controls**: Implement strict access controls and audit logs to monitor who accesses sensitive information.\n5. **Encryption**: Encrypt sensitive data both at rest and in transit to add an additional layer of security.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid embedding tokens or keys directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECURE_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Token not found. Please set the MY_SECURE_TOKEN environment variable.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    // Rest of the application logic\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code example does not require any additional library dependencies beyond the C++ Standard Library to execute properly.\n\n### Relevant Resources\n\n- [OWASP Cheat Sheet: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n- [OWASP Top Ten: A3:2017-Sensitive Data Exposure](https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure)\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-1752d1f7-4ccf-4f82-a3d0-fb044cbaee96",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nIn C++ programming, storing sensitive information such as tokens or keys directly in the source code is a common vulnerability. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these secrets. The hardcoded token \"456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\" is an example of such a vulnerability. \n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control to store sensitive data.\n3. **Secret Management Tools**: Utilize secret management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Encryption**: Encrypt sensitive data if it must be stored in a file or database.\n5. **Access Control**: Implement strict access control measures to limit who can view or modify sensitive information.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid storing a token directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib> // For getenv\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    \n    if (token == nullptr) {\n        std::cerr << \"Error: Token not found. Please set the MY_SECRET_TOKEN environment variable.\" << std::endl;\n        return 1;\n    }\n\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n    // Use the token securely in your application\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ Library (no additional dependencies required)\n\n### Relevant Links\n\n- [OWASP Cheat Sheet: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n- [OWASP Top Ten: A2:2017-Broken Authentication](https://owasp.org/www-project-top-ten/2017/A2_2017-Broken_Authentication)\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-11b6110f-36a6-4d76-ade0-6faa243de1b7",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these sensitive values. Hardcoding such secrets makes it difficult to rotate keys and manage them securely, increasing the risk of data breaches.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information like tokens or keys in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secret Management Tools**: Utilize secret management tools such as HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Encryption**: Encrypt sensitive data if it must be stored in a file, ensuring that the decryption key is also stored securely.\n5. **Access Control**: Implement strict access control measures to limit who can view or modify the source code and configuration files.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid hardcoding a token by using an environment variable:\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Environment variable MY_SECRET_TOKEN is not set.\" << std::endl;\n        return 1;\n    }\n\n    std::cout << \"Token: \" << token << std::endl;\n    // Proceed with using the token securely\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ library (`cstdlib` and `iostream` are part of the standard library and do not require additional dependencies).\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-5c8b071a-e1d0-408f-8b16-54ce2304356d",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract sensitive information. Hardcoding sensitive data like API keys, tokens, or passwords in the source code increases the risk of data breaches and unauthorized access to systems.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and manage sensitive information.\n4. **Encryption**: Encrypt sensitive data if it must be stored in a file or database.\n5. **Access Control**: Implement strict access control measures to ensure only authorized personnel can access sensitive information.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid storing tokens or keys directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECURE_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Token not found in environment variables.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    // Proceed with using the token securely\n    // ...\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code does not require any additional library dependencies beyond the standard C++ library.\n\n### Relevant Resources\n\n- [OWASP Cheat Sheet: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n- [OWASP Top Ten: A2:2017-Broken Authentication](https://owasp.org/www-project-top-ten/2017/A2_2017-Broken_Authentication)\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-46319580-23c6-456c-8c17-5a65ecc4a7e3",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nIn C++ programming, storing sensitive information such as tokens or keys directly in the source code is a common vulnerability. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these secrets. The hardcoded token \"456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\" is an example of such a vulnerability. \n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control to store sensitive data.\n3. **Secret Management Tools**: Utilize secret management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Encryption**: Encrypt sensitive data if it must be stored in a file or database.\n5. **Access Control**: Implement strict access control measures to limit who can view or modify sensitive information.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid storing a token directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib> // For getenv\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    \n    if (token == nullptr) {\n        std::cerr << \"Error: Token not found. Please set the MY_SECRET_TOKEN environment variable.\" << std::endl;\n        return 1;\n    }\n\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n    // Use the token securely in your application\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ Library (no additional dependencies required)\n\n### Relevant Links\n\n- [OWASP Cheat Sheet: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n- [OWASP Top Ten: A2:2017-Broken Authentication](https://owasp.org/www-project-top-ten/2017/A2_2017-Broken_Authentication)\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-aea2a8f3-3eb4-458a-8a2d-47511b9570f5",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract sensitive information such as API keys, encryption keys, or tokens. This vulnerability can lead to data breaches, unauthorized access, and other security incidents.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secret Management Tools**: Utilize secret management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure that only authorized personnel can access sensitive information.\n5. **Encryption**: Encrypt sensitive data both at rest and in transit to add an additional layer of security.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to securely handle sensitive information using environment variables:\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    const char* token = std::getenv(\"MY_SECURE_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Environment variable MY_SECURE_TOKEN not set.\" << std::endl;\n        return 1;\n    }\n\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n    // Use the token securely in your application logic\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code example does not require any additional library dependencies beyond the standard C++ library.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-a840cac5-ef4b-48cc-8dca-1750065a0343",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nIn C++ programming, storing sensitive information such as tokens or keys directly within the source code can lead to significant security vulnerabilities. If the source code is exposed, either through a version control system, a code leak, or reverse engineering, attackers can easily access these sensitive credentials. This can lead to unauthorized access to systems, data breaches, and other security incidents.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in the source code repository. Ensure these files are encrypted or access-controlled.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Control**: Limit access to the source code and configuration files to only those who need it.\n5. **Code Reviews**: Regularly conduct code reviews to ensure that sensitive information is not being stored in the source code.\n\n### Source Code Fix Recommendation\n\n#### Vulnerability Sink\n\n```cpp\n#include <iostream>\n#include <string>\n\nint main() {\n    // Vulnerable: Hardcoded API token\n    std::string apiToken = \"304aab1d359c295d2740970311b943771af944f67432e719df628fe77b61\";\n    std::cout << \"API Token: \" << apiToken << std::endl;\n    return 0;\n}\n```\n\n#### Fixed Code\n\n```cpp\n#include <iostream>\n#include <string>\n#include <cstdlib> // For getenv\n\nint main() {\n    // Mitigation: Retrieve API token from environment variable\n    const char* apiToken = std::getenv(\"API_TOKEN\");\n    if (apiToken == nullptr) {\n        std::cerr << \"Error: API token not set in environment variables.\" << std::endl;\n        return 1;\n    }\n    std::cout << \"API Token: \" << apiToken << std::endl;\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ library (`<iostream>`, `<string>`)\n- C Standard Library (`<cstdlib>` for `getenv` function)\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-a0d246df-07e3-4fef-ae8d-fd8bde3631d1",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nIn C++ programming, storing sensitive information such as tokens, API keys, or passwords directly in the source code is a common security vulnerability. This practice can lead to unauthorized access if the source code is exposed, as these secrets can be easily extracted by malicious actors. This vulnerability is particularly concerning in environments where the source code is shared or stored in version control systems.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in the source code repository. Ensure these files are encrypted or access-controlled.\n3. **Secret Management Tools**: Utilize secret management tools or services (e.g., HashiCorp Vault, AWS Secrets Manager) to securely store and access sensitive information.\n4. **Access Control**: Limit access to the source code and configuration files to only those who need it.\n5. **Code Reviews**: Regularly conduct code reviews to ensure that sensitive information is not being stored in the source code.\n\n### Source Code Fix Recommendation\n\nBelow is an example of how to refactor code to avoid storing a token directly in the source code. The original code might look like this:\n\n```cpp\n#include <iostream>\n\nint main() {\n    // Vulnerable: Token is hardcoded in the source code\n    std::string token = \"3554e37ca417001fce0154e047e7878b18c5ee0e587dd94bf764a4846e500a403f5e\";\n    std::cout << \"Token: \" << token << std::endl;\n    return 0;\n}\n```\n\nRefactored code using environment variables:\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Secure: Token is retrieved from an environment variable\n    const char* token = std::getenv(\"MY_SECURE_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Token not found in environment variables.\" << std::endl;\n        return 1;\n    }\n    std::cout << \"Token: \" << token << std::endl;\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code example does not require any additional library dependencies beyond the C++ Standard Library.\n\n### Relevant Resources\n\n- [OWASP Cheat Sheet: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n- [OWASP Top Ten: A3:2017-Sensitive Data Exposure](https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure)\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-72107698-6c65-47a4-9dbe-ec4c232d8d96",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these sensitive values. Hardcoding such secrets makes it difficult to rotate keys and manage them securely, increasing the risk of data breaches.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information like tokens or keys in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secret Management Tools**: Utilize secret management tools such as HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Encryption**: Encrypt sensitive data if it must be stored in a file, ensuring that the decryption key is also stored securely.\n5. **Access Control**: Implement strict access control measures to limit who can view or modify the source code and configuration files.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid hardcoding a token by using an environment variable:\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Environment variable MY_SECRET_TOKEN is not set.\" << std::endl;\n        return 1;\n    }\n\n    std::cout << \"Token: \" << token << std::endl;\n    // Proceed with using the token securely\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ library (`cstdlib` and `iostream` are part of the standard library and do not require additional dependencies).\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-c82ed693-0660-4a83-a577-8ebfd335626c",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these sensitive credentials. This vulnerability is particularly dangerous because it can lead to data breaches, unauthorized access to services, and other security incidents.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information like tokens or keys in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secrets Management Tools**: Utilize secrets management tools such as HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Control**: Ensure that only authorized personnel have access to the environment variables or configuration files containing sensitive information.\n5. **Encryption**: Encrypt sensitive data at rest and in transit to add an additional layer of security.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid storing a token directly in the source code by using an environment variable.\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    \n    if (token == nullptr) {\n        std::cerr << \"Error: MY_SECRET_TOKEN environment variable is not set.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code does not require any additional library dependencies beyond the standard C++ library.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-6271f593-7782-406f-b79a-869c85e70f2a",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract sensitive information. Hardcoding sensitive data like API keys, encryption keys, or tokens in the source code makes it difficult to rotate or revoke them without redeploying the application. This vulnerability can lead to data breaches, unauthorized access, and other security issues.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in the source code repository and ensure they are properly secured.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and manage sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure only authorized personnel can access sensitive information.\n5. **Encryption**: Encrypt sensitive data both at rest and in transit to add an additional layer of security.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid storing tokens or keys directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECURE_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Token not found. Please set the MY_SECURE_TOKEN environment variable.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    // Proceed with using the token securely\n    // ...\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code does not require any additional library dependencies beyond the standard C++ library.\n\n### Relevant Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-7ce3c381-6006-49ea-800f-b6665abd6edf",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nEmbedding tokens or keys directly in source code is a common security vulnerability in C++ programming and other languages. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these sensitive values. Hardcoded tokens or keys can be inadvertently exposed through version control systems, shared code repositories, or even through reverse engineering of compiled binaries.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information like tokens or keys in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in the source code repository to store sensitive information. Ensure these files are properly secured and access-controlled.\n3. **Secrets Management Tools**: Utilize secrets management tools such as HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure that only authorized personnel can access sensitive information.\n5. **Code Reviews**: Conduct regular code reviews to identify and remove any hardcoded sensitive information.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid embedding a token directly in the source code by using an environment variable:\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: MY_SECRET_TOKEN environment variable is not set.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    // Rest of the application logic\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code example does not require any additional library dependencies beyond the standard C++ library.\n\n### Relevant Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n- [Common Weakness Enumeration: CWE-798 - Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-be87fb2b-1df5-403d-8f96-945f59cabd26",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly within source code is a security vulnerability that can lead to unauthorized access and data breaches. In C++ programming, hardcoding sensitive information like API keys, tokens, or passwords makes it easier for attackers to extract these values, especially if the source code is shared or exposed. This practice increases the risk of credential leakage and can compromise the security of the application and its users.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and manage sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure that only authorized personnel can access sensitive information.\n5. **Encryption**: Encrypt sensitive data both at rest and in transit to add an additional layer of security.\n\n### Source Code Fix Recommendation\n\nBelow is an example of how to refactor code to avoid storing tokens or keys directly in the source code. The original code is assumed to have a hardcoded token, which is replaced by reading from an environment variable.\n\n#### Original Code\n\n```cpp\n#include <iostream>\n\nint main() {\n    // Hardcoded token (vulnerability)\n    std::string token = \"f648991b5f41af9327f627ec686c2949f564afde9d4c714b341b2db9bcf0\";\n    std::cout << \"Token: \" << token << std::endl;\n    return 0;\n}\n```\n\n#### Refactored Code\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve token from environment variable\n    const char* token = std::getenv(\"MY_APP_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Token not found in environment variables.\" << std::endl;\n        return 1;\n    }\n    std::cout << \"Token: \" << token << std::endl;\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe refactored code example does not require any additional library dependencies beyond the standard C++ library.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-1af71a2b-5684-437b-8eb5-64096db9dddd",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nIn C++ programming, storing sensitive information such as tokens or keys directly in the source code is a common vulnerability. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these secrets. This vulnerability is particularly dangerous in environments where the source code is shared or stored in version control systems.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in the source code repository to store sensitive data. Ensure these files are encrypted or access-controlled.\n3. **Secret Management Tools**: Utilize secret management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure that only authorized personnel can access sensitive information.\n5. **Code Reviews**: Conduct regular code reviews to identify and remove any hardcoded secrets.\n\n### Source Code Fix Recommendation\n\nBelow is an example of how to refactor code to avoid storing tokens or keys directly in the source code:\n\n#### Vulnerable Code\n\n```cpp\n#include <iostream>\n\nint main() {\n    // Vulnerable: Hardcoded API token\n    std::string apiToken = \"b751850b1a57168a5693cd924b6b096e08f621827444f70d884f5d0240d2712e10e1\";\n    std::cout << \"API Token: \" << apiToken << std::endl;\n    return 0;\n}\n```\n\n#### Fixed Code\n\n```cpp\n#include <iostream>\n#include <cstdlib> // Required for getenv\n\nint main() {\n    // Mitigation: Retrieve API token from environment variable\n    const char* apiToken = std::getenv(\"API_TOKEN\");\n    if (apiToken == nullptr) {\n        std::cerr << \"Error: API token not set in environment variables.\" << std::endl;\n        return 1;\n    }\n    std::cout << \"API Token: \" << apiToken << std::endl;\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ Library\n- `<cstdlib>` for `getenv` function\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-6718db16-2468-41ba-bc5e-03e1ab48c00b",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract sensitive information. Hardcoding sensitive data like API keys, tokens, or passwords in the source code increases the risk of data breaches and unauthorized access to systems.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in the source code repository to store sensitive data.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and manage sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure that only authorized personnel can access sensitive information.\n5. **Encryption**: Encrypt sensitive data both at rest and in transit to add an additional layer of security.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid storing tokens or keys directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Environment variable MY_SECRET_TOKEN is not set.\" << std::endl;\n        return 1;\n    }\n\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n    // Use the token securely in your application\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code example does not require any additional library dependencies beyond the standard C++ library.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-e966fdb4-c59c-47e0-ac56-5e7c18b3158b",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly within source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract sensitive information. Hardcoding sensitive data like API keys, tokens, or passwords makes it difficult to rotate or revoke them without modifying the source code and redeploying the application. This increases the risk of data breaches and unauthorized access to systems.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and manage sensitive information.\n4. **Encryption**: Encrypt sensitive data if it must be stored in a file or database, and ensure that encryption keys are managed securely.\n5. **Access Control**: Implement strict access control measures to limit who can view or modify sensitive information.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid hardcoding a token by using environment variables:\n\n```cpp\n#include <iostream>\n#include <cstdlib> // Required for getenv\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    \n    if (token == nullptr) {\n        std::cerr << \"Error: MY_SECRET_TOKEN environment variable is not set.\" << std::endl;\n        return 1;\n    }\n\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n    // Use the token securely in your application\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ Library: No additional libraries are required beyond the standard C++ library for this example.\n\n### Relevant Resources\n\n- [OWASP Cheat Sheet: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n- [OWASP Top Ten: A3:2017-Sensitive Data Exposure](https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure)\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-16c5a593-7ec8-45dc-bbe0-d050bf8768ee",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these sensitive values. Hardcoding such secrets makes it difficult to rotate keys and manage them securely, increasing the risk of data breaches.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information like tokens or keys in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secret Management Tools**: Utilize secret management tools such as HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Encryption**: Encrypt sensitive data if it must be stored in a file, ensuring that the decryption key is also stored securely.\n5. **Access Control**: Implement strict access control measures to limit who can view or modify the source code and configuration files.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid hardcoding a token by using an environment variable:\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Environment variable MY_SECRET_TOKEN is not set.\" << std::endl;\n        return 1;\n    }\n\n    std::cout << \"Token: \" << token << std::endl;\n    // Proceed with using the token securely\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ library (`cstdlib` and `iostream` are part of the standard library and do not require additional dependencies).\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-971edb5d-d32e-4822-bca7-6cfc757f51ad",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nIn C++ programming, storing sensitive information such as tokens or keys directly in the source code is a common vulnerability. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these secrets. This vulnerability is particularly dangerous in environments where the source code is shared or stored in version control systems.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in the source code repository. Ensure these files are encrypted or access-controlled.\n3. **Secret Management Tools**: Utilize secret management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Control**: Implement strict access control measures to limit who can view or modify the source code and configuration files.\n5. **Code Reviews**: Conduct regular code reviews to ensure that no sensitive information is hardcoded in the source code.\n\n### Source Code Fix Recommendation\n\nBelow is an example of how to refactor code to avoid storing tokens or keys directly in the source code:\n\n#### Before Fix\n\n```cpp\n#include <iostream>\n\nint main() {\n    // Vulnerable: API key is hardcoded in the source code\n    std::string apiKey = \"50146a1219b903ee6e1a01bd422b8b2bbf57912b61c0e60fbaea543d4f19\";\n    std::cout << \"API Key: \" << apiKey << std::endl;\n    return 0;\n}\n```\n\n#### After Fix\n\n```cpp\n#include <iostream>\n#include <cstdlib> // Required for getenv\n\nint main() {\n    // Secure: API key is retrieved from an environment variable\n    const char* apiKey = std::getenv(\"API_KEY\");\n    if (apiKey == nullptr) {\n        std::cerr << \"Error: API_KEY environment variable not set.\" << std::endl;\n        return 1;\n    }\n    std::cout << \"API Key: \" << apiKey << std::endl;\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ library (`cstdlib` for `getenv` function)\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-22f884c2-d2b1-4d11-8e74-72b1fb4cc573",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nEmbedding tokens or keys directly in source code is a common security vulnerability in C++ programming and other languages. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these sensitive values. This vulnerability is particularly dangerous when the code is stored in a public repository or shared with untrusted parties.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information like tokens or keys in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control to store sensitive data. Ensure these files have appropriate access controls.\n3. **Secrets Management Tools**: Utilize secrets management tools such as HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Controls**: Implement strict access controls and audit logs to monitor who accesses sensitive information.\n5. **Encryption**: Encrypt sensitive data both at rest and in transit to add an additional layer of security.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid embedding tokens or keys directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    \n    if (token == nullptr) {\n        std::cerr << \"Error: Environment variable MY_SECRET_TOKEN is not set.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    // Rest of your application logic\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code does not require any additional library dependencies beyond the C++ Standard Library.\n\n### Relevant Resources\n\n- [OWASP Cheat Sheet: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n- [OWASP Top Ten: A6:2017-Security Misconfiguration](https://owasp.org/www-project-top-ten/2017/A6_2017-Security_Misconfiguration)\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-8b01dc7e-923d-4024-abf6-5748ae005a8a",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nIn C++ programming, storing sensitive information such as tokens or keys directly in the source code is a common vulnerability. This practice can lead to unauthorized access if the source code is exposed, as these tokens or keys can be used to access sensitive systems or data. Attackers who gain access to the source code can easily extract these hardcoded credentials and exploit them.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in the source code repository to store sensitive information. Ensure these files are properly secured and access-controlled.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and manage sensitive information.\n4. **Encryption**: If sensitive information must be stored in a file, ensure it is encrypted and access to the decryption key is tightly controlled.\n5. **Access Control**: Limit access to the source code and ensure that only authorized personnel have access to sensitive information.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example that demonstrates how to avoid storing a token directly in the source code by using an environment variable.\n\n```cpp\n#include <iostream>\n#include <cstdlib> // Required for getenv\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECURE_TOKEN\");\n    \n    if (token == nullptr) {\n        std::cerr << \"Error: Token not found. Please set the MY_SECURE_TOKEN environment variable.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- Standard C++ Library: No additional libraries are required beyond the standard C++ library for this example.\n\n### Relevant Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n- [Common Weakness Enumeration: CWE-798 - Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-d3a304f9-ebdc-430d-b1db-546e31ba15dd",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nIn C++ programming, storing sensitive information such as tokens or keys directly in the source code is a common vulnerability. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these secrets. This vulnerability is particularly dangerous in environments where the source code is shared or stored in version control systems, as it increases the risk of accidental exposure.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in the source code repository to store sensitive data. Ensure these files are properly secured and access-controlled.\n3. **Secret Management Tools**: Utilize secret management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and manage sensitive information.\n4. **Encryption**: If sensitive data must be stored, ensure it is encrypted and that the decryption keys are stored securely.\n5. **Access Control**: Limit access to sensitive information to only those who absolutely need it.\n\n### Source Code Fix Recommendation\n\nBelow is an example of how to refactor the code to avoid storing a token directly in the source code. The original code contains a hardcoded token:\n\n```cpp\n#include <iostream>\n\nint main() {\n    // Original code with hardcoded token\n    std::string token = \"111111111111111111111111111111111111111111111111111111111111\";\n    std::cout << \"Token: \" << token << std::endl;\n    return 0;\n}\n```\n\nRefactored code using environment variables:\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Refactored code using environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Environment variable MY_SECRET_TOKEN is not set.\" << std::endl;\n        return 1;\n    }\n    std::cout << \"Token: \" << token << std::endl;\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe refactored code does not require any additional library dependencies beyond the standard C++ library.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-938f4c66-b866-471b-8fa7-a3324fe1a5b2",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nIn C++ programming, storing sensitive information such as tokens or keys directly in the source code is a common vulnerability. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these secrets. This vulnerability is particularly dangerous in environments where the source code is shared or stored in version control systems, as it increases the risk of accidental exposure.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in the source code repository to store sensitive data. Ensure these files are properly secured and access-controlled.\n3. **Secret Management Tools**: Utilize secret management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and manage sensitive information.\n4. **Encryption**: If sensitive data must be stored, ensure it is encrypted and that the decryption keys are stored securely.\n5. **Access Control**: Limit access to sensitive information to only those who absolutely need it.\n\n### Source Code Fix Recommendation\n\nBelow is an example of how to refactor the code to avoid storing a token directly in the source code. The original code contains a hardcoded token:\n\n```cpp\n#include <iostream>\n\nint main() {\n    // Original code with hardcoded token\n    std::string token = \"111111111111111111111111111111111111111111111111111111111111\";\n    std::cout << \"Token: \" << token << std::endl;\n    return 0;\n}\n```\n\nRefactored code using environment variables:\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Refactored code using environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Environment variable MY_SECRET_TOKEN is not set.\" << std::endl;\n        return 1;\n    }\n    std::cout << \"Token: \" << token << std::endl;\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe refactored code does not require any additional library dependencies beyond the standard C++ library.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            }
+          ],
+          "language": "en-US",
+          "contents": [
+            "localizedData",
+            "nonLocalizedData"
+          ],
+          "isComprehensive": false
+        }
+      },
+      "language": "en-US",
+      "results": [
+        {
+          "ruleId": "glog-0cb07281-0a6e-4dc5-8cfe-6e710a11ec60",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Use of exec detected."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "scripts/python/ensure_copyrights.py"
+                },
+                "region": {
+                  "startLine": 276,
+                  "startColumn": 21,
+                  "endLine": 276,
+                  "endColumn": 35,
+                  "snippet": {
+                    "text": "                    exec(next_arg)\n"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 275,
+                  "endLine": 277,
+                  "snippet": {
+                    "text": "                    next_arg = sys.argv[i]\n                    exec(next_arg)\n                else:\n"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_severity": "MEDIUM",
+            "issue_confidence": "HIGH"
+          }
+        },
+        {
+          "ruleId": "glog-6307ba0b-43da-4930-ad63-60820983699f",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Use of exec detected."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "scripts/python/ensure_copyrights.py"
+                },
+                "region": {
+                  "startLine": 282,
+                  "startColumn": 17,
+                  "endLine": 282,
+                  "endColumn": 23,
+                  "snippet": {
+                    "text": "                exec()\n"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 281,
+                  "endLine": 283,
+                  "snippet": {
+                    "text": "            else:\n                exec()\n        else:\n"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_severity": "MEDIUM",
+            "issue_confidence": "HIGH"
+          }
+        },
+        {
+          "ruleId": "glog-fcf757a5-c78c-477f-b2bc-61a932f1847f",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "A weak cipher mode of operation was used"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bench/cipher/bench_cipher.cc"
+                },
+                "region": {
+                  "startLine": 51,
+                  "startColumn": 33,
+                  "endLine": 51,
+                  "endColumn": 37,
+                  "charOffset": 2374,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "AEAD",
+                    "rendered": {
+                      "text": "AEAD",
+                      "markdown": "`AEAD`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Cryptography.Symmetric.CipherMode.Weak"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-c63b9801-4186-4b60-9e53-caf7a15e5106",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "A weak cipher mode of operation was used"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bench/cipher/bench_cipher.cc"
+                },
+                "region": {
+                  "startLine": 129,
+                  "startColumn": 33,
+                  "endLine": 129,
+                  "endColumn": 37,
+                  "charOffset": 5358,
+                  "charLength": 4,
+                  "snippet": {
+                    "text": "AEAD",
+                    "rendered": {
+                      "text": "AEAD",
+                      "markdown": "`AEAD`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Cryptography.Symmetric.CipherMode.Weak"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-58c1fd17-fd64-45f8-951e-e7b14fc95bbe",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Problematic C function detected (memcpy)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bench/cipher/bench_cipher.cc"
+                },
+                "region": {
+                  "startLine": 136,
+                  "startColumn": 12,
+                  "endLine": 136,
+                  "endColumn": 38,
+                  "charOffset": 5578,
+                  "charLength": 26,
+                  "snippet": {
+                    "text": "memcpy(iv, data.m_tag, 16)",
+                    "rendered": {
+                      "text": "memcpy(iv, data.m_tag, 16)",
+                      "markdown": "`memcpy(iv, data.m_tag, 16)`"
+                    }
+                  },
+                  "sourceLanguage": "cpp"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "There are a number of conditions in which memcpy can introduce a vulnerability (mismatched buffer sizes, null pointers, etc.). More secure alternitives perform additional validation of the source and destination buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "bench/cipher/bench_cipher.cc"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 5578,
+                        "charLength": 26
+                      },
+                      "insertedContent": {
+                        "text": "memcpy_s(iv, <size of iv>,  data.m_tag,  16)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-96fd5d67-c741-4a78-9972-bdc72f7d5d65",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Problematic C function detected (malloc)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/rng/drbg-test.c"
+                },
+                "region": {
+                  "startLine": 62,
+                  "startColumn": 28,
+                  "endLine": 62,
+                  "endColumn": 69,
+                  "charOffset": 2395,
+                  "charLength": 41,
+                  "snippet": {
+                    "text": "malloc(alcp_drbg_context_size(&drbg_info)",
+                    "rendered": {
+                      "text": "malloc(alcp_drbg_context_size(&drbg_info)",
+                      "markdown": "`malloc(alcp_drbg_context_size(&drbg_info)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If the value provided to malloc is the result of unsafe integer math, it can result in an exploitable condition. "
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "examples/rng/drbg-test.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 2395,
+                        "charLength": 41
+                      },
+                      "insertedContent": {
+                        "text": "calloc(<number of elements>, <size of each element>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-f5dbb084-8a84-43ad-887f-0d01fd2733a8",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "Problematic C function detected (strlen)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 266,
+                  "startColumn": 24,
+                  "endLine": 266,
+                  "endColumn": 44,
+                  "charOffset": 9561,
+                  "charLength": 20,
+                  "snippet": {
+                    "text": "strlen((const char*)",
+                    "rendered": {
+                      "text": "strlen((const char*)",
+                      "markdown": "`strlen((const char*)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "examples/digest/sha3_512_example.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 9561,
+                        "charLength": 20
+                      },
+                      "insertedContent": {
+                        "text": "strlen_s((const char*, <size of (const char*>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "examples/digest/sha3_512_example.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 9561,
+                        "charLength": 20
+                      },
+                      "insertedContent": {
+                        "text": "strnlen((const char*, <size of (const char*>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-1db0cc19-cb9e-49db-8eb5-a325c21f40c1",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 236,
+                  "startColumn": 10,
+                  "endLine": 236,
+                  "endColumn": 72,
+                  "charOffset": 8793,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"04ec12f98c3fbc349197e81aa876a8f5ad16099811a8fd8fd294fea92bdc\"",
+                    "rendered": {
+                      "text": "\"04ec12f98c3fbc349197e81aa876a8f5ad16099811a8fd8fd294fea92bdc\"",
+                      "markdown": "`\"04ec12f98c3fbc349197e81aa876a8f5ad16099811a8fd8fd294fea92bdc\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-1622ca1e-b9a9-46f7-a44d-2ff602e4ac3c",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 235,
+                  "startColumn": 10,
+                  "endLine": 235,
+                  "endColumn": 80,
+                  "charOffset": 8712,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"986a078b5a8300fc48cc5459e9a8e61692bb6679d61f3a91725b6ede2e49396559fe\"",
+                    "rendered": {
+                      "text": "\"986a078b5a8300fc48cc5459e9a8e61692bb6679d61f3a91725b6ede2e49396559fe\"",
+                      "markdown": "`\"986a078b5a8300fc48cc5459e9a8e61692bb6679d61f3a91725b6ede2e49396559fe\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-c914b972-e844-4496-8248-a5721ace312f",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 226,
+                  "startColumn": 10,
+                  "endLine": 226,
+                  "endColumn": 80,
+                  "charOffset": 8395,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"32d1adacd8c53106644ca6c929e63b3f4e167a8562fe231793cc8a158741a96c2c1d\"",
+                    "rendered": {
+                      "text": "\"32d1adacd8c53106644ca6c929e63b3f4e167a8562fe231793cc8a158741a96c2c1d\"",
+                      "markdown": "`\"32d1adacd8c53106644ca6c929e63b3f4e167a8562fe231793cc8a158741a96c2c1d\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-575cdebe-133d-4739-aa32-905773113063",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 219,
+                  "startColumn": 10,
+                  "endLine": 219,
+                  "endColumn": 80,
+                  "charOffset": 8089,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"03ffee86742e264462329844946e3d7c3395dba93061b7f16ee2e2b1114282e8feeb\"",
+                    "rendered": {
+                      "text": "\"03ffee86742e264462329844946e3d7c3395dba93061b7f16ee2e2b1114282e8feeb\"",
+                      "markdown": "`\"03ffee86742e264462329844946e3d7c3395dba93061b7f16ee2e2b1114282e8feeb\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-4399d020-3c02-41d4-bbc0-1a379690912c",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 207,
+                  "startColumn": 10,
+                  "endLine": 207,
+                  "endColumn": 72,
+                  "charOffset": 7585,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"1fbe0c985302ba1b0d8dc78c086346b533b49c030d99a27daf1139d6e75e\"",
+                    "rendered": {
+                      "text": "\"1fbe0c985302ba1b0d8dc78c086346b533b49c030d99a27daf1139d6e75e\"",
+                      "markdown": "`\"1fbe0c985302ba1b0d8dc78c086346b533b49c030d99a27daf1139d6e75e\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-f20c6a55-04ca-482c-8466-d43342db4a17",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 202,
+                  "startColumn": 10,
+                  "endLine": 202,
+                  "endColumn": 72,
+                  "charOffset": 7336,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"22ed07124109dabb97c71595993b089ef42dd04603d9f7ffc455cadb8ca1\"",
+                    "rendered": {
+                      "text": "\"22ed07124109dabb97c71595993b089ef42dd04603d9f7ffc455cadb8ca1\"",
+                      "markdown": "`\"22ed07124109dabb97c71595993b089ef42dd04603d9f7ffc455cadb8ca1\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-719f387d-8cf8-4178-9ef9-7f0edb33fcd8",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 201,
+                  "startColumn": 10,
+                  "endLine": 201,
+                  "endColumn": 80,
+                  "charOffset": 7255,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"895f5d389335c55b76991ea0a4772b9b65ebe23251ad53e848b43adf4af55521fae1\"",
+                    "rendered": {
+                      "text": "\"895f5d389335c55b76991ea0a4772b9b65ebe23251ad53e848b43adf4af55521fae1\"",
+                      "markdown": "`\"895f5d389335c55b76991ea0a4772b9b65ebe23251ad53e848b43adf4af55521fae1\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-47634c0c-c1b9-456d-9bf8-02bfee80da04",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 206,
+                  "startColumn": 10,
+                  "endLine": 206,
+                  "endColumn": 80,
+                  "charOffset": 7504,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"04a371e84ecfb5b8b77cb48610fca8182dd457ce6f326a0fd3d7ec2f1e91636dee69\"",
+                    "rendered": {
+                      "text": "\"04a371e84ecfb5b8b77cb48610fca8182dd457ce6f326a0fd3d7ec2f1e91636dee69\"",
+                      "markdown": "`\"04a371e84ecfb5b8b77cb48610fca8182dd457ce6f326a0fd3d7ec2f1e91636dee69\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-faf88cfb-ecda-4273-99a6-25ec604e6d2d",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 193,
+                  "startColumn": 18,
+                  "endLine": 193,
+                  "endColumn": 79,
+                  "charOffset": 6881,
+                  "charLength": 61,
+                  "snippet": {
+                    "text": "\"456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\"",
+                    "rendered": {
+                      "text": "\"456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\"",
+                      "markdown": "`\"456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-3e5cdb95-f8f8-46b2-96a9-81dac2154d6b",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 199,
+                  "startColumn": 18,
+                  "endLine": 199,
+                  "endColumn": 80,
+                  "charOffset": 7155,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"",
+                    "rendered": {
+                      "text": "\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"",
+                      "markdown": "`\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-1a32ab43-2e60-4456-a215-0a0c380504b6",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 195,
+                  "startColumn": 10,
+                  "endLine": 195,
+                  "endColumn": 80,
+                  "charOffset": 6976,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"0187a5e72fac99b95e76f827ecc111ee2ea9ff810a2a58d082f3eedd435bf6df9274\"",
+                    "rendered": {
+                      "text": "\"0187a5e72fac99b95e76f827ecc111ee2ea9ff810a2a58d082f3eedd435bf6df9274\"",
+                      "markdown": "`\"0187a5e72fac99b95e76f827ecc111ee2ea9ff810a2a58d082f3eedd435bf6df9274\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-296626df-0b09-4a03-b2a5-8bab37aafff9",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 196,
+                  "startColumn": 10,
+                  "endLine": 196,
+                  "endColumn": 72,
+                  "charOffset": 7057,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"a6d7e04553b7b582598b3b6933d3ed8feb0f6ce59b387c89d23b4a6f071c\"",
+                    "rendered": {
+                      "text": "\"a6d7e04553b7b582598b3b6933d3ed8feb0f6ce59b387c89d23b4a6f071c\"",
+                      "markdown": "`\"a6d7e04553b7b582598b3b6933d3ed8feb0f6ce59b387c89d23b4a6f071c\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-b58239a7-d10e-41e7-86ca-c5db6c41a9c1",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 191,
+                  "startColumn": 18,
+                  "endLine": 191,
+                  "endColumn": 80,
+                  "charOffset": 6771,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"",
+                    "rendered": {
+                      "text": "\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"",
+                      "markdown": "`\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-0513a3f5-89b1-4893-be37-cf10923b5b58",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 188,
+                  "startColumn": 10,
+                  "endLine": 188,
+                  "endColumn": 72,
+                  "charOffset": 6673,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"06099dbdb370f9b62adafaec759ea961609d737a5635b927343b53b12c93\"",
+                    "rendered": {
+                      "text": "\"06099dbdb370f9b62adafaec759ea961609d737a5635b927343b53b12c93\"",
+                      "markdown": "`\"06099dbdb370f9b62adafaec759ea961609d737a5635b927343b53b12c93\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-977275c3-df3f-4804-af07-765f8b9fb138",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 184,
+                  "startColumn": 18,
+                  "endLine": 184,
+                  "endColumn": 80,
+                  "charOffset": 6409,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"",
+                    "rendered": {
+                      "text": "\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"",
+                      "markdown": "`\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-77001a7b-da31-4cf3-8fdc-a1290cf570ca",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 180,
+                  "startColumn": 10,
+                  "endLine": 180,
+                  "endColumn": 75,
+                  "charOffset": 6230,
+                  "charLength": 65,
+                  "snippet": {
+                    "text": "\"50047957fd0dc86770b27a9221a0f7c11fd9249156b6b285631db844c0c832f\"",
+                    "rendered": {
+                      "text": "\"50047957fd0dc86770b27a9221a0f7c11fd9249156b6b285631db844c0c832f\"",
+                      "markdown": "`\"50047957fd0dc86770b27a9221a0f7c11fd9249156b6b285631db844c0c832f\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-107bb126-3249-4577-97c2-f6166075d1a6",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 178,
+                  "startColumn": 18,
+                  "endLine": 178,
+                  "endColumn": 80,
+                  "charOffset": 6132,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"",
+                    "rendered": {
+                      "text": "\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"",
+                      "markdown": "`\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-86fd7f80-95c7-436f-84c8-ed11649746f6",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 175,
+                  "startColumn": 10,
+                  "endLine": 175,
+                  "endColumn": 72,
+                  "charOffset": 6034,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"a6d7e04553b7b582598b3b6933d3ed8feb0f6ce59b387c89d23b4a6f071c\"",
+                    "rendered": {
+                      "text": "\"a6d7e04553b7b582598b3b6933d3ed8feb0f6ce59b387c89d23b4a6f071c\"",
+                      "markdown": "`\"a6d7e04553b7b582598b3b6933d3ed8feb0f6ce59b387c89d23b4a6f071c\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-6ae8d9e6-a2fc-4865-ac85-032f5802bcee",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 174,
+                  "startColumn": 10,
+                  "endLine": 174,
+                  "endColumn": 80,
+                  "charOffset": 5953,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"0187a5e72fac99b95e76f827ecc111ee2ea9ff810a2a58d082f3eedd435bf6df9274\"",
+                    "rendered": {
+                      "text": "\"0187a5e72fac99b95e76f827ecc111ee2ea9ff810a2a58d082f3eedd435bf6df9274\"",
+                      "markdown": "`\"0187a5e72fac99b95e76f827ecc111ee2ea9ff810a2a58d082f3eedd435bf6df9274\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-1752d1f7-4ccf-4f82-a3d0-fb044cbaee96",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 172,
+                  "startColumn": 18,
+                  "endLine": 172,
+                  "endColumn": 79,
+                  "charOffset": 5858,
+                  "charLength": 61,
+                  "snippet": {
+                    "text": "\"456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\"",
+                    "rendered": {
+                      "text": "\"456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\"",
+                      "markdown": "`\"456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-11b6110f-36a6-4d76-ade0-6faa243de1b7",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 170,
+                  "startColumn": 18,
+                  "endLine": 170,
+                  "endColumn": 80,
+                  "charOffset": 5748,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"",
+                    "rendered": {
+                      "text": "\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"",
+                      "markdown": "`\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-5c8b071a-e1d0-408f-8b16-54ce2304356d",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 187,
+                  "startColumn": 10,
+                  "endLine": 187,
+                  "endColumn": 80,
+                  "charOffset": 6592,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"153539e6d6176f4f808ef888ffada1eb9349f96e8f8c1e363d62f30454d49093dc75\"",
+                    "rendered": {
+                      "text": "\"153539e6d6176f4f808ef888ffada1eb9349f96e8f8c1e363d62f30454d49093dc75\"",
+                      "markdown": "`\"153539e6d6176f4f808ef888ffada1eb9349f96e8f8c1e363d62f30454d49093dc75\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-46319580-23c6-456c-8c17-5a65ecc4a7e3",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 186,
+                  "startColumn": 18,
+                  "endLine": 186,
+                  "endColumn": 79,
+                  "charOffset": 6519,
+                  "charLength": 61,
+                  "snippet": {
+                    "text": "\"456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\"",
+                    "rendered": {
+                      "text": "\"456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\"",
+                      "markdown": "`\"456789abcdef0123456789abcdef0123456789abcdef0123456789abcde\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-aea2a8f3-3eb4-458a-8a2d-47511b9570f5",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 181,
+                  "startColumn": 10,
+                  "endLine": 181,
+                  "endColumn": 77,
+                  "charOffset": 6306,
+                  "charLength": 67,
+                  "snippet": {
+                    "text": "\"4208b6c0d3d4773ee527eb3ea817c970c67bdda262c547e706775dc9f43d425c6\"",
+                    "rendered": {
+                      "text": "\"4208b6c0d3d4773ee527eb3ea817c970c67bdda262c547e706775dc9f43d425c6\"",
+                      "markdown": "`\"4208b6c0d3d4773ee527eb3ea817c970c67bdda262c547e706775dc9f43d425c6\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-a840cac5-ef4b-48cc-8dca-1750065a0343",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 167,
+                  "startColumn": 10,
+                  "endLine": 167,
+                  "endColumn": 72,
+                  "charOffset": 5650,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"304aab1d359c295d2740970311b943771af944f67432e719df628fe77b61\"",
+                    "rendered": {
+                      "text": "\"304aab1d359c295d2740970311b943771af944f67432e719df628fe77b61\"",
+                      "markdown": "`\"304aab1d359c295d2740970311b943771af944f67432e719df628fe77b61\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-a0d246df-07e3-4fef-ae8d-fd8bde3631d1",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 166,
+                  "startColumn": 10,
+                  "endLine": 166,
+                  "endColumn": 80,
+                  "charOffset": 5569,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"3554e37ca417001fce0154e047e7878b18c5ee0e587dd94bf764a4846e500a403f5e\"",
+                    "rendered": {
+                      "text": "\"3554e37ca417001fce0154e047e7878b18c5ee0e587dd94bf764a4846e500a403f5e\"",
+                      "markdown": "`\"3554e37ca417001fce0154e047e7878b18c5ee0e587dd94bf764a4846e500a403f5e\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-72107698-6c65-47a4-9dbe-ec4c232d8d96",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 164,
+                  "startColumn": 18,
+                  "endLine": 164,
+                  "endColumn": 80,
+                  "charOffset": 5470,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"",
+                    "rendered": {
+                      "text": "\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"",
+                      "markdown": "`\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-c82ed693-0660-4a83-a577-8ebfd335626c",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 156,
+                  "startColumn": 10,
+                  "endLine": 156,
+                  "endColumn": 72,
+                  "charOffset": 5176,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"123af1f5f94c11e3e9402c3ac558f500199d95b6d3e301758586281dcd26\"",
+                    "rendered": {
+                      "text": "\"123af1f5f94c11e3e9402c3ac558f500199d95b6d3e301758586281dcd26\"",
+                      "markdown": "`\"123af1f5f94c11e3e9402c3ac558f500199d95b6d3e301758586281dcd26\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-6271f593-7782-406f-b79a-869c85e70f2a",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 161,
+                  "startColumn": 10,
+                  "endLine": 161,
+                  "endColumn": 72,
+                  "charOffset": 5372,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"16e9192af3c91a7ec57647e3934057340b4cf408d5a56592f8274eec53f0\"",
+                    "rendered": {
+                      "text": "\"16e9192af3c91a7ec57647e3934057340b4cf408d5a56592f8274eec53f0\"",
+                      "markdown": "`\"16e9192af3c91a7ec57647e3934057340b4cf408d5a56592f8274eec53f0\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-7ce3c381-6006-49ea-800f-b6665abd6edf",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 155,
+                  "startColumn": 10,
+                  "endLine": 155,
+                  "endColumn": 80,
+                  "charOffset": 5095,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"a69f73cca23a9ac5c8b567dc185a756e97c982164fe25859e0d1dcc1475c80a615b2\"",
+                    "rendered": {
+                      "text": "\"a69f73cca23a9ac5c8b567dc185a756e97c982164fe25859e0d1dcc1475c80a615b2\"",
+                      "markdown": "`\"a69f73cca23a9ac5c8b567dc185a756e97c982164fe25859e0d1dcc1475c80a615b2\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-be87fb2b-1df5-403d-8f96-945f59cabd26",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 151,
+                  "startColumn": 10,
+                  "endLine": 151,
+                  "endColumn": 72,
+                  "charOffset": 4983,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"f648991b5f41af9327f627ec686c2949f564afde9d4c714b341b2db9bcf0\"",
+                    "rendered": {
+                      "text": "\"f648991b5f41af9327f627ec686c2949f564afde9d4c714b341b2db9bcf0\"",
+                      "markdown": "`\"f648991b5f41af9327f627ec686c2949f564afde9d4c714b341b2db9bcf0\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-1af71a2b-5684-437b-8eb5-64096db9dddd",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 160,
+                  "startColumn": 10,
+                  "endLine": 160,
+                  "endColumn": 80,
+                  "charOffset": 5291,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"b751850b1a57168a5693cd924b6b096e08f621827444f70d884f5d0240d2712e10e1\"",
+                    "rendered": {
+                      "text": "\"b751850b1a57168a5693cd924b6b096e08f621827444f70d884f5d0240d2712e10e1\"",
+                      "markdown": "`\"b751850b1a57168a5693cd924b6b096e08f621827444f70d884f5d0240d2712e10e1\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-6718db16-2468-41ba-bc5e-03e1ab48c00b",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 150,
+                  "startColumn": 10,
+                  "endLine": 150,
+                  "endColumn": 80,
+                  "charOffset": 4902,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"d6aa3bf678379d7fa2c684f3044aa48a46c60082bd7eba727b8295f8ee69081ae704\"",
+                    "rendered": {
+                      "text": "\"d6aa3bf678379d7fa2c684f3044aa48a46c60082bd7eba727b8295f8ee69081ae704\"",
+                      "markdown": "`\"d6aa3bf678379d7fa2c684f3044aa48a46c60082bd7eba727b8295f8ee69081ae704\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-e966fdb4-c59c-47e0-ac56-5e7c18b3158b",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 149,
+                  "startColumn": 18,
+                  "endLine": 149,
+                  "endColumn": 70,
+                  "charOffset": 4838,
+                  "charLength": 52,
+                  "snippet": {
+                    "text": "\"456789abcdef0123456789abcdef0123456789abcdef012345\"",
+                    "rendered": {
+                      "text": "\"456789abcdef0123456789abcdef0123456789abcdef012345\"",
+                      "markdown": "`\"456789abcdef0123456789abcdef0123456789abcdef012345\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-16c5a593-7ec8-45dc-bbe0-d050bf8768ee",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 147,
+                  "startColumn": 18,
+                  "endLine": 147,
+                  "endColumn": 80,
+                  "charOffset": 4728,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"",
+                    "rendered": {
+                      "text": "\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"",
+                      "markdown": "`\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-971edb5d-d32e-4822-bca7-6cfc757f51ad",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 144,
+                  "startColumn": 10,
+                  "endLine": 144,
+                  "endColumn": 72,
+                  "charOffset": 4630,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"50146a1219b903ee6e1a01bd422b8b2bbf57912b61c0e60fbaea543d4f19\"",
+                    "rendered": {
+                      "text": "\"50146a1219b903ee6e1a01bd422b8b2bbf57912b61c0e60fbaea543d4f19\"",
+                      "markdown": "`\"50146a1219b903ee6e1a01bd422b8b2bbf57912b61c0e60fbaea543d4f19\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-22f884c2-d2b1-4d11-8e74-72b1fb4cc573",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 143,
+                  "startColumn": 10,
+                  "endLine": 143,
+                  "endColumn": 80,
+                  "charOffset": 4549,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"c2509d9d11747a41dba76b44034fc7bbf5f36f38abd45e5ae37fc17da6146cabed78\"",
+                    "rendered": {
+                      "text": "\"c2509d9d11747a41dba76b44034fc7bbf5f36f38abd45e5ae37fc17da6146cabed78\"",
+                      "markdown": "`\"c2509d9d11747a41dba76b44034fc7bbf5f36f38abd45e5ae37fc17da6146cabed78\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-8b01dc7e-923d-4024-abf6-5748ae005a8a",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 142,
+                  "startColumn": 18,
+                  "endLine": 142,
+                  "endColumn": 56,
+                  "charOffset": 4499,
+                  "charLength": 38,
+                  "snippet": {
+                    "text": "\"111111111111111111111111111111111122\"",
+                    "rendered": {
+                      "text": "\"111111111111111111111111111111111122\"",
+                      "markdown": "`\"111111111111111111111111111111111122\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-d3a304f9-ebdc-430d-b1db-546e31ba15dd",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 138,
+                  "startColumn": 18,
+                  "endLine": 138,
+                  "endColumn": 80,
+                  "charOffset": 4279,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"111111111111111111111111111111111111111111111111111111111111\"",
+                    "rendered": {
+                      "text": "\"111111111111111111111111111111111111111111111111111111111111\"",
+                      "markdown": "`\"111111111111111111111111111111111111111111111111111111111111\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-938f4c66-b866-471b-8fa7-a3324fe1a5b2",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Do not store tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/sha3_512_example.c"
+                },
+                "region": {
+                  "startLine": 132,
+                  "startColumn": 18,
+                  "endLine": 132,
+                  "endColumn": 80,
+                  "charOffset": 3949,
+                  "charLength": 62,
+                  "snippet": {
+                    "text": "\"111111111111111111111111111111111111111111111111111111111111\"",
+                    "rendered": {
+                      "text": "\"111111111111111111111111111111111111111111111111111111111111\"",
+                      "markdown": "`\"111111111111111111111111111111111111111111111111111111111111\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        }
+      ],
+      "newlineSequences": [
+        "\r\n",
+        "\n"
+      ]
+    }
+  ]
+}
