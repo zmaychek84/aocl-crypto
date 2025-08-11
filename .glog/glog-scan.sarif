@@ -1,0 +1,2024 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Glog.AI",
+          "organization": "Glog.AI",
+          "fullName": "Glog, Making software more secure",
+          "version": "1.0.0",
+          "semanticVersion": "1.0.0",
+          "informationUri": "https://www.glog.ai",
+          "rules": [
+            {
+              "id": "glog-3515e45e-d77f-4dd9-97fb-189fb2e0e4ed",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe \"Detection of exec Usage\" vulnerability in Python arises when the `exec()` function is used to execute dynamically constructed Python code. This can lead to security risks, especially if the input to `exec()` is not properly sanitized, as it may allow an attacker to execute arbitrary code. The specific vulnerability sink `exec(next_arg)` indicates that the `next_arg` variable is being executed without validation, which could be exploited if `next_arg` contains malicious code.\n\n### General Mitigation Advice\n\n1. **Avoid Using `exec()`**: If possible, refactor the code to avoid using `exec()`. Consider using safer alternatives like functions, classes, or other Python constructs that do not require dynamic code execution.\n\n2. **Input Validation**: If `exec()` must be used, ensure that the input is strictly validated. Only allow known safe inputs and reject any input that could be potentially harmful.\n\n3. **Use Restricted Execution Environments**: Consider using libraries or frameworks that provide a restricted execution environment to limit what the executed code can do.\n\n4. **Logging and Monitoring**: Implement logging and monitoring to detect any unusual activity that might indicate an exploitation attempt.\n\n### Source Code Fix Recommendation\n\nTo mitigate the vulnerability in the specific code example, you can refactor the code to avoid using `exec()`. Here's an example of how you might do this:\n\n```python\n# Original vulnerable code\n# exec(next_arg)\n\n# Refactored code without exec()\ndef execute_command(command):\n    if command == \"safe_command\":\n        # Execute the safe command\n        print(\"Executing safe command\")\n    else:\n        raise ValueError(\"Unsafe command detected\")\n\n# Example usage\nnext_arg = \"safe_command\"  # This should be a validated input\nexecute_command(next_arg)\n```\n\n### Library Dependencies\n\nThe provided code example does not require any additional library dependencies to execute properly.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-94: Improper Control of Generation of Code ('Code Injection')](https://cwe.mitre.org/data/definitions/94.html)"
+              },
+              "properties": {
+                "tags": [
+                  "B102"
+                ]
+              }
+            },
+            {
+              "id": "glog-3eaa3b41-87de-424e-8d18-e4daa07f3109",
+              "help": {
+                "text": "",
+                "markdown": "### Description of \"Detection of exec Usage\" Vulnerability\n\nThe `exec()` function in Python is used to execute dynamically created Python code, which can be a string or object code. While powerful, its use can lead to significant security vulnerabilities if not handled properly. The primary risk associated with `exec()` is the potential for code injection attacks, where an attacker can execute arbitrary code within the context of the application. This can lead to unauthorized access, data leakage, or even complete system compromise.\n\n### General Mitigation Advice\n\n1. **Avoid Using `exec()`**: The best way to mitigate the risks associated with `exec()` is to avoid using it altogether. Consider alternative approaches that do not require dynamic code execution.\n\n2. **Input Validation and Sanitization**: If `exec()` must be used, ensure that all inputs are thoroughly validated and sanitized to prevent injection of malicious code.\n\n3. **Use Restricted Execution Environments**: If possible, execute code in a restricted environment where the potential damage of executing arbitrary code is minimized.\n\n4. **Limit Scope and Permissions**: Restrict the scope and permissions of the code being executed to the bare minimum necessary for functionality.\n\n5. **Logging and Monitoring**: Implement logging and monitoring to detect any unusual or unauthorized use of `exec()`.\n\n### Source Code Fix Recommendation\n\nIf you have a code snippet that uses `exec()`, consider the following example for a safer alternative:\n\n```python\n# Original code using exec()\nuser_input = \"print('Hello, World!')\"\nexec(user_input)\n\n# Safer alternative using a dictionary for controlled execution\nallowed_functions = {\n    'print': print\n}\n\nuser_input = \"print('Hello, World!')\"\nexec(user_input, {\"__builtins__\": None}, allowed_functions)\n```\n\nIn this example, the use of `exec()` is restricted by providing a controlled environment where only specific functions are allowed to be executed.\n\n### Library Dependencies\n\nThe above code example does not require any additional library dependencies beyond the Python standard library.\n\n### Relevant OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-94: Improper Control of Generation of Code ('Code Injection')](https://cwe.mitre.org/data/definitions/94.html)"
+              },
+              "properties": {
+                "tags": [
+                  "B102"
+                ]
+              }
+            },
+            {
+              "id": "glog-0a0fc16e-d2fe-4885-a2c2-95e1a5b13fc1",
+              "help": {
+                "text": ""
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-interesting-api-calls"
+                ]
+              }
+            },
+            {
+              "id": "glog-ea624b03-c610-44bb-b1ad-d5622880567c",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nA Stack Buffer Overflow Vulnerability is a type of security vulnerability that occurs when a program writes more data to a buffer located on the stack than what is actually allocated for that buffer. This results in the excess data overflowing into adjacent memory locations on the stack, potentially overwriting other data or even control information. This can lead to erratic program behavior, including memory access errors, incorrect results, a crash, or a breach of system security.\n\nIn JavaScript, this vulnerability is less common due to the high-level nature of the language which abstracts away direct memory management from the developer. However, it can still occur in certain cases, especially when dealing with lower-level operations or when using JavaScript in conjunction with other languages.\n\nThe provided code snippet is not directly related to JavaScript, but rather to C or C++ programming. It uses the `memset` function to set a certain amount of memory to a specific value. If the value of `rb->m_hash_len * sizeof(Uint8)` is larger than the size of the `digest` buffer, a buffer overflow can occur.\n\n## Mitigation Advice\n\nTo prevent buffer overflow vulnerabilities, it is important to always ensure that you are not writing more data to a buffer than it can hold. This can be achieved by:\n\n- Always checking the size of the data to be written against the size of the buffer.\n- Using functions that limit the amount of data written to the size of the buffer.\n- Using high-level APIs when possible, which automatically handle memory management.\n\n## Source Code Fix Recommendation\n\nIn the provided code snippet, a potential fix would be to ensure that `rb->m_hash_len * sizeof(Uint8)` does not exceed the size of the `digest` buffer. This could be done by adding a condition before the `memset` call:\n\n```c\nif (rb->m_hash_len * sizeof(Uint8) <= sizeof(digest)) {\n    memset(digest, 0, rb->m_hash_len * sizeof(Uint8));\n} else {\n    // Handle error\n}\n```\n\n## Library Dependencies\n\nThe provided code snippet requires the following libraries:\n\n- `string.h` for the `memset` function.\n- `stdint.h` for the `Uint8` type.\n\n## OWASP and CWE Resources\n\n- [OWASP Buffer Overflow](https://owasp.org/www-community/vulnerabilities/Buffer_Overflow)\n- [CWE-121: Stack-based Buffer Overflow](https://cwe.mitre.org/data/definitions/121.html)"
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-write-into-stack-buffer"
+                ]
+              }
+            },
+            {
+              "id": "glog-9628f537-8a83-41e3-93b1-69d9d0639a71",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nA Stack Buffer Overflow vulnerability occurs when a program writes more data to a buffer located on the stack than what is actually allocated for that buffer. This excess data then overflows into adjacent memory space, overwriting the information there, which could include other buffers, variables and program flow data. This can lead to erratic program behavior, including memory access errors, incorrect results, a crash, or a breach of system security.\n\nIn JavaScript, this vulnerability is less common due to the high-level nature of the language which abstracts away direct memory management from the developer. However, it can still occur in certain scenarios, especially when dealing with low-level operations or when using JavaScript in conjunction with other languages.\n\nThe provided code snippet:\n\n```javascript\nmemset(digest, 0, data.m_digest_len * sizeof(Uint8));\n```\n\nThis code is trying to set the memory of `digest` to 0 for `data.m_digest_len * sizeof(Uint8)` bytes. If `data.m_digest_len` is larger than the allocated size of `digest`, this will result in a buffer overflow.\n\n## Mitigation Advice\n\nTo prevent buffer overflow vulnerabilities, you should always ensure that you're not writing more data to a buffer than it can hold. This can be achieved by:\n\n1. Validating and sanitizing all input data.\n2. Using functions that limit the amount of data that can be written to a buffer.\n3. Avoiding the use of dangerous, non-bounded functions like `memset`.\n4. Using modern programming practices and languages that abstract away direct memory management.\n\n## Source Code Fix Recommendation\n\nIn this specific case, you should ensure that `data.m_digest_len` does not exceed the size of `digest`. This can be done by adding a check before the `memset` call:\n\n```javascript\nif (data.m_digest_len <= digest.length) {\n    memset(digest, 0, data.m_digest_len * sizeof(Uint8));\n} else {\n    // Handle the error\n}\n```\n\n## Library Dependencies\n\nThe provided code snippet seems to be using a `memset` function, which is not a standard JavaScript function. It's likely that this code is using a library or is part of a larger system that provides this function. The `Uint8` type is also not standard JavaScript, and might be provided by a library or the environment in which this code is running.\n\n## References\n\n- [OWASP Buffer Overflow](https://owasp.org/www-community/vulnerabilities/Buffer_Overflow)\n- [CWE-121: Stack-based Buffer Overflow](https://cwe.mitre.org/data/definitions/121.html)"
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-write-into-stack-buffer"
+                ]
+              }
+            },
+            {
+              "id": "glog-cd31712f-24f8-4ec8-9785-7ac81044f5ae",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nInsecure API function calls vulnerability in JavaScript refers to the use of insecure or deprecated API functions that can lead to security vulnerabilities. In the provided code snippet, the `memcpy` function is used, which is a common source of vulnerabilities due to its lack of bounds checking. This can lead to buffer overflow vulnerabilities if not used carefully.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to use secure alternatives to `memcpy` that include bounds checking, such as `strncpy` or `memcpy_s`. These functions will prevent buffer overflow by ensuring that the destination buffer is not written past its size.\n\n## Source Code Fix Recommendation\n\nReplace the `memcpy` function with a secure alternative. For example:\n\n```javascript\nstrncpy(iv, data.m_tag, 16);\n```\n\nor\n\n```javascript\nmemcpy_s(iv, sizeof(iv), data.m_tag, 16);\n```\n\n## Library Dependencies\n\nThe `memcpy` function is part of the C standard library (`<string.h>`), so no additional libraries are required for the provided code snippet.\n\n## OWASP Resources\n\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n- [OWASP API Security](https://owasp.org/www-project-api-security/)\n\n## Common Weakness Enumeration (CWE)\n\n- [CWE-676: Use of Potentially Dangerous Function](https://cwe.mitre.org/data/definitions/676.html)\n- [CWE-120: Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')](https://cwe.mitre.org/data/definitions/120.html)\n\nPlease note that the links provided are active and accessible to anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-interesting-api-calls"
+                ]
+              }
+            },
+            {
+              "id": "glog-3051f931-7439-4763-a5ad-b55d53436abe",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\n\"Vulnerability due to Assertion-Based Input Validation in Non-Debug Builds\" is a security vulnerability in JavaScript that occurs when assertions are used for input validation in non-debug builds. Assertions are typically used in development to catch bugs, but they are often removed or disabled in production builds for performance reasons. If an assertion is used for input validation, and it is removed or disabled in a production build, then the input validation is also removed or disabled, which can lead to security vulnerabilities.\n\nIn the provided code example, the assertion is checking that the size of `sample_plaintxt` is less than or equal to the size of `sample_output`. If this assertion is removed or disabled in a production build, then there is no guarantee that this condition will be met, which could lead to buffer overflow vulnerabilities.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, avoid using assertions for input validation. Instead, use explicit error handling and input validation techniques that are not removed or disabled in production builds. \n\n## Source Code Fix Recommendation\n\nHere is a recommended fix for the provided code example:\n\n```javascript\nif (sizeof(sample_plaintxt) > sizeof(sample_output)) {\n    throw new Error('Input is too large');\n}\n```\n\nIn this fix, an error is thrown if the size of `sample_plaintxt` is greater than the size of `sample_output`. This error handling will not be removed or disabled in production builds, ensuring that the input validation is always performed.\n\n## Library Dependencies\n\nThe provided code example does not appear to have any library dependencies.\n\n## OWASP Resources\n\n- [OWASP Top 10 2017 Category A3: Sensitive Data Exposure](https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure)\n\n## Common Weakness Enumeration (CWE)\n\n- [CWE-20: Improper Input Validation](https://cwe.mitre.org/data/definitions/20.html)\n\nPlease note that the links provided are active and accessible to anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-suspicious-assert"
+                ]
+              }
+            },
+            {
+              "id": "glog-cf4364a2-3314-43ad-8026-ea66336ea6fc",
+              "help": {
+                "text": ""
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-interesting-api-calls"
+                ]
+              }
+            },
+            {
+              "id": "glog-4294dc48-7586-4647-993f-5c6e6820c498",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\n\"Vulnerability due to Assertion-Based Input Validation in Non-Debug Builds\" is a security vulnerability in JavaScript that occurs when assertions are used for input validation in non-debug builds. Assertions are typically used in development to catch bugs, but they are often removed or disabled in production builds for performance reasons. If an assertion is used for input validation, and it is removed or disabled in a production build, then the input validation is also removed or disabled, which can lead to security vulnerabilities.\n\nIn the provided code example, the assertion is checking that the size of `sample_plaintxt` is less than or equal to the size of `sample_output`. If this assertion is removed or disabled in a production build, then there is no guarantee that this condition will be met, which could lead to buffer overflow vulnerabilities.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, avoid using assertions for input validation. Instead, use explicit error handling and input validation techniques that are not removed or disabled in production builds. \n\n## Source Code Fix Recommendation\n\nHere is a recommended fix for the provided code example:\n\n```javascript\nif (sizeof(sample_plaintxt) > sizeof(sample_output)) {\n    throw new Error('Input is too large');\n}\n```\n\nIn this fix, an error is thrown if the size of `sample_plaintxt` is greater than the size of `sample_output`. This error handling will not be removed or disabled in production builds, ensuring that the input validation is always performed.\n\n## Library Dependencies\n\nThe provided code example does not appear to have any library dependencies.\n\n## OWASP Resources\n\n- [OWASP Top 10 2017 Category A3: Sensitive Data Exposure](https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure)\n\n## Common Weakness Enumeration (CWE)\n\n- [CWE-20: Improper Input Validation](https://cwe.mitre.org/data/definitions/20.html)\n\nPlease note that the links provided are active and accessible to anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-suspicious-assert"
+                ]
+              }
+            },
+            {
+              "id": "glog-1864116b-df36-4bf8-9bd3-b5c586ac8812",
+              "help": {
+                "text": ""
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-interesting-api-calls"
+                ]
+              }
+            },
+            {
+              "id": "glog-e8c8e49f-8711-4447-9b11-4a8ab2b07c24",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe \"Detected Issue with C Function (malloc)\" vulnerability in C++ typically arises from improper handling of memory allocation, which can lead to memory leaks, buffer overflows, or undefined behavior. In the context of the function `malloc(alcp_drbg_context_size(&drbg_info))`, the vulnerability may occur if the size calculated by `alcp_drbg_context_size(&drbg_info)` is incorrect, leading to insufficient memory allocation. This can result in writing beyond the allocated memory, causing potential security risks such as data corruption or application crashes.\n\n### General Mitigation Advice\n\n1. **Validate Input:** Ensure that the input to `alcp_drbg_context_size` is validated and sanitized to prevent incorrect size calculations.\n2. **Check Return Values:** Always check the return value of `malloc` to ensure that memory allocation was successful.\n3. **Use Safe Functions:** Consider using safer alternatives or wrappers that include bounds checking.\n4. **Free Allocated Memory:** Ensure that all allocated memory is properly freed to prevent memory leaks.\n5. **Use Smart Pointers:** In C++, prefer using smart pointers (e.g., `std::unique_ptr`, `std::shared_ptr`) to manage memory automatically.\n\n### Source Code Fix Recommendation\n\n```cpp\n#include <iostream>\n#include <cstdlib> // for malloc and free\n#include <stdexcept> // for std::runtime_error\n\n// Assume alcp_drbg_context_size is defined elsewhere\nextern size_t alcp_drbg_context_size(void* drbg_info);\n\nvoid* allocate_drbg_context(void* drbg_info) {\n    size_t size = alcp_drbg_context_size(drbg_info);\n    if (size == 0) {\n        throw std::runtime_error(\"Invalid size for DRBG context\");\n    }\n\n    void* context = malloc(size);\n    if (!context) {\n        throw std::runtime_error(\"Memory allocation failed\");\n    }\n\n    return context;\n}\n\nint main() {\n    void* drbg_info = nullptr; // Initialize appropriately\n    try {\n        void* context = allocate_drbg_context(drbg_info);\n        // Use the context\n        // ...\n\n        // Free the allocated memory\n        free(context);\n    } catch (const std::exception& e) {\n        std::cerr << \"Error: \" << e.what() << std::endl;\n    }\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- `<cstdlib>`: Required for `malloc` and `free`.\n- `<stdexcept>`: Required for `std::runtime_error`.\n- `<iostream>`: Required for input/output operations.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)\n- [CWE-401: Missing Release of Memory after Effective Lifetime](https://cwe.mitre.org/data/definitions/401.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS161085"
+                ]
+              }
+            },
+            {
+              "id": "glog-8becf13f-efe1-4257-8252-e3f99fafbf8d",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nUnsigned to Signed Conversion Vulnerability is a type of vulnerability that occurs when an unsigned number is converted to a signed number in a way that leads to unexpected behavior. This can happen in JavaScript when a large unsigned number is converted to a signed number, causing an integer overflow. This can lead to a variety of security issues, including buffer overflows and other types of memory corruption.\n\nIn the provided code, the vulnerability could occur if `dataLen` is a large unsigned number. When passed to `memset`, it could cause an integer overflow, leading to a buffer overflow if `inputText` is not large enough to hold `dataLen` bytes.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should ensure that all conversions from unsigned to signed integers are done safely. This can be done by checking the size of the unsigned integer before converting it and ensuring that it does not exceed the maximum value that can be represented by a signed integer.\n\n## Source Code Fix Recommendation\n\nIn the provided code, you could add a check to ensure that `dataLen` does not exceed the maximum value that can be represented by a signed integer. Here is an example of how you could do this:\n\n```javascript\nif (dataLen > Number.MAX_SAFE_INTEGER) {\n    throw new Error('dataLen is too large');\n}\n\nmemset(inputText, 10, dataLen);\n```\n\n## Library Dependencies\n\nThe provided code appears to be using the `memset` function, which is not a built-in JavaScript function. It may be part of a library such as `Buffer`, but without more context, it's hard to say for sure.\n\n## OWASP and CWE Links\n\n- [CWE-681: Incorrect Conversion between Numeric Types](https://cwe.mitre.org/data/definitions/681.html)"
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-signed-unsigned-conversion"
+                ]
+              }
+            },
+            {
+              "id": "glog-f69836b0-a5b4-4aa1-94df-5175b64a7650",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe \"Detected Issue with C Function (malloc)\" vulnerability in C++ typically arises from improper handling of memory allocation, which can lead to memory leaks, buffer overflows, or undefined behavior. In the context of the function `malloc(alcp_drbg_context_size(&drbg_info))`, the vulnerability may occur if the size calculated by `alcp_drbg_context_size(&drbg_info)` is incorrect, leading to insufficient memory allocation. This can result in writing beyond the allocated memory, causing potential security risks such as data corruption or application crashes.\n\n### General Mitigation Advice\n\n1. **Validate Input:** Ensure that the input to `alcp_drbg_context_size` is validated and sanitized to prevent incorrect size calculations.\n2. **Check Return Values:** Always check the return value of `malloc` to ensure that memory allocation was successful.\n3. **Use Safe Functions:** Consider using safer alternatives or wrappers that include bounds checking.\n4. **Free Allocated Memory:** Ensure that all allocated memory is properly freed to prevent memory leaks.\n5. **Use Smart Pointers:** In C++, prefer using smart pointers (e.g., `std::unique_ptr`, `std::shared_ptr`) to manage memory automatically.\n\n### Source Code Fix Recommendation\n\n```cpp\n#include <iostream>\n#include <cstdlib> // for malloc and free\n#include <stdexcept> // for std::runtime_error\n\n// Assume alcp_drbg_context_size is defined elsewhere\nextern size_t alcp_drbg_context_size(void* drbg_info);\n\nvoid* allocate_drbg_context(void* drbg_info) {\n    size_t size = alcp_drbg_context_size(drbg_info);\n    if (size == 0) {\n        throw std::runtime_error(\"Invalid size for DRBG context\");\n    }\n\n    void* context = malloc(size);\n    if (!context) {\n        throw std::runtime_error(\"Memory allocation failed\");\n    }\n\n    return context;\n}\n\nint main() {\n    void* drbg_info = nullptr; // Initialize appropriately\n    try {\n        void* context = allocate_drbg_context(drbg_info);\n        // Use the context\n        // ...\n\n        // Free the allocated memory\n        free(context);\n    } catch (const std::exception& e) {\n        std::cerr << \"Error: \" << e.what() << std::endl;\n    }\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- `<cstdlib>`: Required for `malloc` and `free`.\n- `<stdexcept>`: Required for `std::runtime_error`.\n- `<iostream>`: Required for input/output operations.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)\n- [CWE-401: Missing Release of Memory after Effective Lifetime](https://cwe.mitre.org/data/definitions/401.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS161085"
+                ]
+              }
+            },
+            {
+              "id": "glog-892d1a62-16b6-4c43-acd2-c92b11f2b039",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nInsecure API function calls vulnerability in JavaScript refers to the use of insecure or deprecated API functions that can lead to security vulnerabilities. These vulnerabilities can lead to a variety of issues such as memory corruption, buffer overflow, and other types of security breaches. \n\nIn the given code snippet, `malloc` is used to allocate memory. This function is part of the C standard library and is not available in JavaScript. However, if we were to consider this in a C context, it's important to note that `malloc` does not initialize the memory it allocates, which can lead to undefined behavior if the memory is accessed before being initialized.\n\n## Mitigation Advice\n\nTo mitigate this type of vulnerability, it's recommended to use secure and up-to-date API functions. In JavaScript, memory management is handled automatically, so there's no need to manually allocate or deallocate memory like in C. \n\nIf you're working in a context where memory management is necessary (like C or C++), consider using functions that initialize the memory they allocate, such as `calloc` instead of `malloc`.\n\n## Code Fix Recommendation\n\nSince `malloc` is not available in JavaScript, there's no direct equivalent. However, if you're trying to create a new array of a certain length, you can use the `Array` constructor:\n\n```javascript\nlet outputText = new Array(inputLen);\n```\n\n## Library Dependencies\n\nThe given code snippet does not require any library dependencies to execute properly in JavaScript.\n\n## OWASP and CWE Resources\n\n- [CWE-676: Use of Potentially Dangerous Function](https://cwe.mitre.org/data/definitions/676.html)"
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-interesting-api-calls"
+                ]
+              }
+            },
+            {
+              "id": "glog-8c289282-b03f-4c64-9fdb-c17d07fe3953",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\n\"Unsigned to Signed Conversion Vulnerability\" is a type of vulnerability that occurs when an unsigned number is converted to a signed number in an unsafe manner. This can lead to unexpected behavior, as the conversion can result in a negative number if the unsigned number is greater than the maximum value that can be represented by the signed number. In JavaScript, this can lead to potential security risks, such as buffer overflows or integer overflows.\n\nIn the provided code snippet, `memset(iv, 10, IVLEN_MAX);`, there is no direct unsigned to signed conversion vulnerability. However, if `IVLEN_MAX` is an unsigned integer and is used in a context where a signed integer is expected, it could potentially lead to a vulnerability.\n\n## Mitigation Advice\n\nTo mitigate this type of vulnerability, it is recommended to always perform safe type conversions and to use programming constructs that do not implicitly convert between signed and unsigned numbers. Additionally, it is important to validate and sanitize all inputs, especially those that are used in memory allocation or array indexing operations.\n\n## Source Code Fix Recommendation\n\nIf `IVLEN_MAX` is an unsigned integer, you should ensure that it is safely converted to a signed integer before it is used. This can be done using the `Math.sign()` function in JavaScript:\n\n```javascript\nlet signedIVLEN_MAX = Math.sign(IVLEN_MAX);\nmemset(iv, 10, signedIVLEN_MAX);\n```\n\n## Library Dependencies\n\nThe provided code snippet appears to be using the `memset` function, which is a C standard library function and is not available in JavaScript. Therefore, it is not possible to list the JavaScript library dependencies for this code snippet.\n\n## References\n\n- [CWE-681: Incorrect Conversion between Numeric Types](https://cwe.mitre.org/data/definitions/681.html)"
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-signed-unsigned-conversion"
+                ]
+              }
+            },
+            {
+              "id": "glog-0b6cf935-1006-4efe-92f9-4f673f23f472",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nUnsigned to Signed Conversion Vulnerability is a type of vulnerability that occurs when an unsigned number is converted to a signed number in a way that leads to unexpected behavior. This can happen in JavaScript when a large unsigned number is converted to a signed number, causing an integer overflow. This can lead to a variety of security issues, including buffer overflows and other types of memory corruption.\n\nIn the provided code snippet, the vulnerability might occur if the third argument of the `memset` function is a large unsigned number that gets converted to a signed number, causing an integer overflow.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should always validate and sanitize your inputs. Make sure that the values you are passing to functions like `memset` are within the expected range. You should also consider using a static code analysis tool to detect potential vulnerabilities in your code.\n\n## Source Code Fix Recommendation\n\nIn the provided code snippet, you should ensure that the third argument of the `memset` function is a valid, non-negative integer. Here is a fixed version of the code:\n\n```javascript\nlet size = 32;\nif (size < 0 || size > Number.MAX_SAFE_INTEGER) {\n    throw new Error('Invalid size');\n}\nmemset(key, 0, size);\n```\n\n## Library Dependencies\n\nThe provided code snippet requires the `memset` function, which is not a built-in JavaScript function. You would need to import a library that provides this function, such as the `Buffer` class in Node.js.\n\n## References\n\n- [OWASP Top 10 2017 Category A3: Sensitive Data Exposure](https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure)\n- [CWE-681: Incorrect Conversion between Numeric Types](https://cwe.mitre.org/data/definitions/681.html)"
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-signed-unsigned-conversion"
+                ]
+              }
+            },
+            {
+              "id": "glog-c2b13421-81d6-4de2-b8d2-7bbbf56b46fd",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\n\"Unsigned to Signed Conversion Vulnerability\" is a type of vulnerability that occurs when an unsigned number is converted to a signed number in an unsafe manner. This can lead to unexpected behavior, as the conversion can result in a negative number if the unsigned number is greater than the maximum value that the signed number can represent. In JavaScript, this can lead to potential security risks, such as buffer overflow attacks, if the converted number is used as an array index or a loop counter.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, developers should avoid using signed numbers where unsigned numbers are expected. If a conversion from unsigned to signed is necessary, developers should ensure that the unsigned number is within the range that the signed number can represent before performing the conversion. Additionally, developers should use secure coding practices and perform thorough testing to identify and fix any potential vulnerabilities.\n\n## Source Code Fix Recommendation\n\nThe provided code snippet is in C, not JavaScript. However, the concept of the vulnerability remains the same. Here's how you might mitigate it in JavaScript:\n\n```javascript\nlet tag = new Array(TAGLEN_MAX).fill(0);\n```\n\nIn this JavaScript code, we're creating an array with a length of `TAGLEN_MAX` and filling it with zeros. This avoids the need for a potentially unsafe conversion from unsigned to signed.\n\n## Library Dependencies\n\nThe JavaScript code does not require any library dependencies.\n\n## OWASP and CWE Links\n\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n- [CWE-681: Incorrect Conversion between Numeric Types](https://cwe.mitre.org/data/definitions/681.html)\n\nPlease note that these links are subject to change and may not always be accessible. Always ensure to check the validity of the links before using them."
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-signed-unsigned-conversion"
+                ]
+              }
+            },
+            {
+              "id": "glog-9eae5cba-82f8-4977-8bd5-33508ff86ca4",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe \"Detected Issue with C Function (malloc)\" vulnerability in C++ typically arises from improper handling of memory allocation, which can lead to memory leaks, buffer overflows, or undefined behavior. In the context of the function `malloc(alcp_drbg_context_size(&drbg_info))`, the vulnerability may occur if the size calculated by `alcp_drbg_context_size(&drbg_info)` is incorrect, leading to insufficient memory allocation. This can result in writing beyond the allocated memory, causing potential security risks such as data corruption or application crashes.\n\n### General Mitigation Advice\n\n1. **Validate Input:** Ensure that the input to `alcp_drbg_context_size` is validated and sanitized to prevent incorrect size calculations.\n2. **Check Return Values:** Always check the return value of `malloc` to ensure that memory allocation was successful.\n3. **Use Safe Functions:** Consider using safer alternatives or wrappers that include bounds checking.\n4. **Free Allocated Memory:** Ensure that all allocated memory is properly freed to prevent memory leaks.\n5. **Use Smart Pointers:** In C++, prefer using smart pointers (e.g., `std::unique_ptr`, `std::shared_ptr`) to manage memory automatically.\n\n### Source Code Fix Recommendation\n\n```cpp\n#include <iostream>\n#include <cstdlib> // for malloc and free\n#include <stdexcept> // for std::runtime_error\n\n// Assume alcp_drbg_context_size is defined elsewhere\nextern size_t alcp_drbg_context_size(void* drbg_info);\n\nvoid* allocate_drbg_context(void* drbg_info) {\n    size_t size = alcp_drbg_context_size(drbg_info);\n    if (size == 0) {\n        throw std::runtime_error(\"Invalid size for DRBG context\");\n    }\n\n    void* context = malloc(size);\n    if (!context) {\n        throw std::runtime_error(\"Memory allocation failed\");\n    }\n\n    return context;\n}\n\nint main() {\n    void* drbg_info = nullptr; // Initialize appropriately\n    try {\n        void* context = allocate_drbg_context(drbg_info);\n        // Use the context\n        // ...\n\n        // Free the allocated memory\n        free(context);\n    } catch (const std::exception& e) {\n        std::cerr << \"Error: \" << e.what() << std::endl;\n    }\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- `<cstdlib>`: Required for `malloc` and `free`.\n- `<stdexcept>`: Required for `std::runtime_error`.\n- `<iostream>`: Required for input/output operations.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)\n- [CWE-401: Missing Release of Memory after Effective Lifetime](https://cwe.mitre.org/data/definitions/401.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS161085"
+                ]
+              }
+            },
+            {
+              "id": "glog-5333f51a-7680-4655-97dc-5457b62c169b",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe \"Detected Issue with C Function (malloc)\" vulnerability in C++ typically arises from improper use of the `malloc` function, which is used to allocate memory dynamically. In the given code snippet, `malloc(hash_size * 2 + 1)`, the vulnerability may occur if `hash_size` is not properly validated, leading to potential integer overflow or insufficient memory allocation. This can result in buffer overflows, memory corruption, or denial of service.\n\n### General Mitigation Advice\n\n1. **Input Validation**: Ensure that `hash_size` is validated to prevent integer overflow. It should be checked to ensure it is within a reasonable range before being used in calculations for memory allocation.\n2. **Use Safer Functions**: Consider using safer alternatives like `calloc`, which initializes the allocated memory to zero, or C++ constructs like `std::vector` or `std::unique_ptr` that manage memory automatically.\n3. **Error Handling**: Always check the return value of `malloc` to ensure that memory allocation was successful before using the allocated memory.\n4. **Limit Memory Usage**: Implement limits on memory allocation to prevent excessive memory usage that could lead to denial of service.\n\n### Source Code Fix Recommendation\n\n```cpp\n#include <iostream>\n#include <cstdlib> // for malloc and free\n#include <limits>  // for std::numeric_limits\n\nvoid processHashSize(size_t hash_size) {\n    // Validate hash_size to prevent overflow\n    if (hash_size > (std::numeric_limits<size_t>::max() - 1) / 2) {\n        std::cerr << \"Error: hash_size is too large, potential overflow detected.\" << std::endl;\n        return;\n    }\n\n    // Allocate memory safely\n    size_t allocation_size = hash_size * 2 + 1;\n    char* buffer = static_cast<char*>(malloc(allocation_size));\n\n    // Check if malloc succeeded\n    if (buffer == nullptr) {\n        std::cerr << \"Error: Memory allocation failed.\" << std::endl;\n        return;\n    }\n\n    // Use the buffer for processing...\n\n    // Free the allocated memory\n    free(buffer);\n}\n\nint main() {\n    size_t hash_size = 10; // Example hash size\n    processHashSize(hash_size);\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- `<iostream>`: For input and output operations.\n- `<cstdlib>`: For `malloc` and `free` functions.\n- `<limits>`: For `std::numeric_limits` to perform safe checks on size limits.\n\n### Relevant Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n\n### Common Weakness Enumeration\n\n- [CWE-190: Integer Overflow or Wraparound](https://cwe.mitre.org/data/definitions/190.html)\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS161085"
+                ]
+              }
+            },
+            {
+              "id": "glog-1329143a-846b-4d74-b300-eefcdba38788",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nSoftware Error Message Exposure Vulnerability refers to the insecure practice of exposing detailed error messages to users. These messages can contain sensitive information such as system details, file paths, or even parts of the source code, which can be exploited by attackers to gain unauthorized access or knowledge about the system. In JavaScript, this vulnerability can occur when error handling is not properly implemented.\n\nThe provided code snippet is not in JavaScript, but in C. It prints the hexadecimal representation of the value at a certain memory location. If an error occurs during this operation, the error message might expose sensitive information about the system's memory layout.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should avoid exposing detailed error messages to the users. Instead, log the detailed error messages internally for debugging purposes and show a generic error message to the user. \n\n## Source Code Fix Recommendation\n\nIn JavaScript, you can use `try-catch` blocks to handle errors and prevent them from being exposed to the user. Here is an example:\n\n```javascript\ntry {\n    // Your code here\n} catch (error) {\n    console.error(error); // Log the error internally\n    alert('An error occurred'); // Show a generic error message to the user\n}\n```\n\n## Library Dependencies\n\nThe provided code snippet is in C, not JavaScript. It uses the `printf` function from the `stdio.h` library.\n\n## References\n\n- [OWASP Error Handling](https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html)\n- [CWE-209: Information Exposure Through an Error Message](https://cwe.mitre.org/data/definitions/209.html)"
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-memory-address-exposure"
+                ]
+              }
+            },
+            {
+              "id": "glog-89a35db4-7643-49d9-8a1f-a4e1cf64ca51",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe \"Detected Issue with C Function (malloc)\" vulnerability in C++ programming arises when the `malloc` function is used incorrectly, leading to potential memory allocation issues. Specifically, the vulnerability occurs when the size of the memory allocation is not calculated correctly, which can result in buffer overflows, memory corruption, or undefined behavior. In the provided example, `malloc(sizeof(char))` is used, which allocates memory for only a single character. If more memory is needed, this allocation will be insufficient, leading to potential vulnerabilities.\n\n### General Mitigation Advice\n\n1. **Use `new` in C++**: Prefer using C++ memory management techniques such as `new` and `delete` instead of C-style `malloc` and `free`.\n2. **Correct Size Calculation**: Ensure that the size passed to `malloc` is sufficient for the data structure you intend to store.\n3. **Check Return Values**: Always check the return value of `malloc` to ensure that memory allocation was successful.\n4. **Use Safer Alternatives**: Consider using safer alternatives like `std::vector` or `std::string` for dynamic memory management in C++.\n\n### Source Code Fix Recommendation\n\nTo fix the specific vulnerability sink, ensure that the size passed to `malloc` is correctly calculated. If you need to allocate memory for a string of characters, include the null terminator and use the correct size:\n\n```cpp\n#include <cstdlib> // Required for malloc and free\n#include <cstring> // Required for strlen\n\nint main() {\n    const char* exampleString = \"Hello, World!\";\n    size_t length = strlen(exampleString) + 1; // +1 for the null terminator\n    char* buffer = (char*)malloc(length * sizeof(char));\n\n    if (buffer == nullptr) {\n        // Handle memory allocation failure\n        return -1;\n    }\n\n    strcpy(buffer, exampleString); // Copy the string into the allocated buffer\n\n    // Use the buffer...\n\n    free(buffer); // Free the allocated memory\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- `<cstdlib>`: Required for `malloc` and `free`.\n- `<cstring>`: Required for `strlen` and `strcpy`.\n\n### Relevant Links\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n- [CWE-122: Heap-based Buffer Overflow](https://cwe.mitre.org/data/definitions/122.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS161085"
+                ]
+              }
+            },
+            {
+              "id": "glog-01adacfa-5e25-4545-b6e9-1142c37101f7",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe \"Detected Issue with C Function (malloc)\" vulnerability in C++ typically arises from improper handling of memory allocation, particularly when using the `malloc` function. This can lead to various issues such as buffer overflows, memory leaks, or undefined behavior if the allocated memory is not properly managed. In the specific case of `malloc(alcp_rng_context_size(&rng_info))`, the vulnerability may occur if the function `alcp_rng_context_size` returns an incorrect size, leading to insufficient memory allocation.\n\n### General Mitigation Advice\n\n1. **Validate Input:** Ensure that the input to `alcp_rng_context_size` is validated and sanitized to prevent incorrect size calculations.\n2. **Check Return Values:** Always check the return value of `malloc` to ensure that memory allocation was successful.\n3. **Use Safe Alternatives:** Consider using safer alternatives like `calloc` which initializes the allocated memory to zero.\n4. **Free Allocated Memory:** Ensure that all allocated memory is properly freed to prevent memory leaks.\n5. **Use Smart Pointers:** In C++, prefer using smart pointers (e.g., `std::unique_ptr`, `std::shared_ptr`) to manage memory automatically.\n\n### Source Code Fix Recommendation\n\n```cpp\n#include <cstdlib>\n#include <iostream>\n\n// Assuming alcp_rng_context_size is defined elsewhere\nextern size_t alcp_rng_context_size(void* rng_info);\n\nvoid* allocate_rng_context(void* rng_info) {\n    size_t size = alcp_rng_context_size(rng_info);\n    if (size == 0) {\n        std::cerr << \"Error: Invalid size returned by alcp_rng_context_size.\" << std::endl;\n        return nullptr;\n    }\n\n    void* context = malloc(size);\n    if (!context) {\n        std::cerr << \"Error: Memory allocation failed.\" << std::endl;\n        return nullptr;\n    }\n\n    // Initialize memory if necessary\n    // memset(context, 0, size);\n\n    return context;\n}\n\nvoid free_rng_context(void* context) {\n    free(context);\n}\n```\n\n### Library Dependencies\n\n- Standard C++ library (`cstdlib`, `iostream`)\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)\n- [CWE-401: Missing Release of Memory after Effective Lifetime](https://cwe.mitre.org/data/definitions/401.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS161085"
+                ]
+              }
+            },
+            {
+              "id": "glog-53c1bde0-3c5d-43ff-a906-95e88bf93ddc",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a security vulnerability that can lead to unauthorized access and data breaches. In C++ programming, hardcoding sensitive information like API keys, tokens, or passwords makes it easier for attackers to extract these values, especially if the source code is shared or exposed. This practice increases the risk of credential leakage and unauthorized access to systems or data.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Encryption**: Encrypt sensitive data if it must be stored in a file or database.\n5. **Access Control**: Limit access to sensitive information to only those who need it.\n\n### Source Code Fix Recommendation\n\nBelow is an example of how to refactor the code to avoid storing tokens or keys directly in the source code. The original hardcoded token is replaced with an environment variable.\n\n#### Original Code\n\n```cpp\n#include <iostream>\n\nint main() {\n    std::string token = \"ff347bfb8075c075505e55ec8bac2da1414ba98b77085d2a198b251278d92025b78f\";\n    std::cout << \"Token: \" << token << std::endl;\n    return 0;\n}\n```\n\n#### Refactored Code\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Environment variable MY_SECRET_TOKEN is not set.\" << std::endl;\n        return 1;\n    }\n    std::cout << \"Token: \" << token << std::endl;\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe refactored code does not require any additional library dependencies beyond the standard C++ library.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-3621e719-0980-405e-a673-3f2783b66845",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nInsecure API function calls vulnerability in JavaScript refers to the use of API functions that are known to be insecure and can lead to various security issues such as buffer overflow, memory corruption, or data leakage. In the provided code snippet, the `memcpy` function is used, which is a common source of such vulnerabilities. This function copies a certain amount of data from one memory location to another, without checking the size of the destination buffer. If the source data is larger than the destination buffer, it can lead to buffer overflow, which can be exploited to execute arbitrary code or crash the system.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to replace the use of insecure API functions with safer alternatives that include proper bounds checking. In the case of `memcpy`, a safer alternative would be `memmove`, which also copies data from one memory location to another, but includes bounds checking to prevent buffer overflow.\n\n## Source Code Fix Recommendation\n\nReplace the `memcpy` function call with `memmove`:\n\n```javascript\nmemmove(key, test_key[testNumber], 16);\n```\n\n## Library Dependencies\n\nThe provided code snippet does not appear to have any specific library dependencies in JavaScript. However, in a C or C++ context, it would require the `string.h` library for the `memcpy` or `memmove` function.\n\n## OWASP Resources\n\n- [OWASP API Security](https://owasp.org/www-project-api-security/)\n\n## Common Weakness Enumeration (CWE)\n\n- [CWE-676: Use of Potentially Dangerous Function](https://cwe.mitre.org/data/definitions/676.html)\n- [CWE-120: Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')](https://cwe.mitre.org/data/definitions/120.html)"
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-interesting-api-calls"
+                ]
+              }
+            },
+            {
+              "id": "glog-69ebcc14-bc11-4243-809a-20d0e0e44628",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe vulnerability associated with the `strlen` function in C++ arises from its inability to handle non-null-terminated strings. The `strlen` function calculates the length of a string by iterating through the characters until it encounters a null terminator (`'\\0'`). If the string is not properly null-terminated, `strlen` will continue reading beyond the intended buffer, potentially leading to undefined behavior, memory access violations, or information disclosure.\n\n### General Mitigation Advice\n\n1. **Ensure Proper Null-Termination**: Always ensure that strings are null-terminated before passing them to `strlen`.\n2. **Use Safer Alternatives**: Consider using safer string handling functions or libraries that manage string lengths explicitly, such as `std::string` in C++.\n3. **Bounds Checking**: Implement bounds checking to ensure that buffer overflows do not occur.\n4. **Static Analysis Tools**: Use static analysis tools to detect potential vulnerabilities in the code.\n\n### Source Code Fix Recommendation\n\nTo mitigate the risk associated with `strlen`, ensure that the input string is properly null-terminated. Alternatively, use `std::string` which manages its own length and is safer to use.\n\n#### Vulnerable Code Example\n\n```cpp\n#include <cstring>\n\nvoid processString(const char* input) {\n    size_t length = strlen(input); // Potential vulnerability if input is not null-terminated\n    // Further processing...\n}\n```\n\n#### Fixed Code Example\n\n```cpp\n#include <string>\n\nvoid processString(const std::string& input) {\n    size_t length = input.length(); // Safe usage with std::string\n    // Further processing...\n}\n```\n\n### Library Dependencies\n\nFor the fixed code example using `std::string`, the following library is required:\n\n- `<string>`: Provides the `std::string` class.\n\n### Relevant Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n\n### Common Weakness Enumeration\n\n- [CWE-170: Improper Null Termination](https://cwe.mitre.org/data/definitions/170.html)\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS140021"
+                ]
+              }
+            },
+            {
+              "id": "glog-a08de77f-58c0-47a8-a1d3-6faf8bcce991",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\n\"Unsigned to Signed Conversion Vulnerability\" is a type of vulnerability that occurs when an unsigned number is converted to a signed number in an unsafe manner. This can lead to unexpected behavior, as the conversion can result in a negative number if the unsigned number is greater than the maximum value that can be represented by the signed number. In JavaScript, this can lead to potential security risks, such as buffer overflows or integer overflows.\n\nIn the provided code snippet, `memset(ad, 0, ADLEN_MAX);`, the vulnerability could occur if `ADLEN_MAX` is an unsigned integer that is larger than the maximum value that can be represented by the signed integer expected by `memset`.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should ensure that all conversions from unsigned to signed integers are done in a safe manner. This can be achieved by checking the value of the unsigned integer before the conversion and ensuring that it is within the range of the signed integer.\n\n## Source Code Fix Recommendation\n\nHere is a simple fix for the provided code snippet:\n\n```javascript\nif (ADLEN_MAX > Number.MAX_SAFE_INTEGER) {\n    throw new Error('ADLEN_MAX is too large!');\n} else {\n    memset(ad, 0, ADLEN_MAX);\n}\n```\n\nIn this fix, we check if `ADLEN_MAX` is larger than `Number.MAX_SAFE_INTEGER`, which is the maximum safe integer in JavaScript. If it is, we throw an error. Otherwise, we proceed with the `memset` operation.\n\n## Library Dependencies\n\nThe provided code snippet seems to be using a `memset` function, which is not a built-in function in JavaScript. It might be a part of a custom library or a C/C++ code. Therefore, without additional context, it's hard to determine the exact library dependencies.\n\n## OWASP and CWE Resources\n\n- [CWE-681: Incorrect Conversion between Numeric Types](https://cwe.mitre.org/data/definitions/681.html)\n\nPlease note that the links provided are active and accessible to anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-signed-unsigned-conversion"
+                ]
+              }
+            },
+            {
+              "id": "glog-b6fc335d-6706-4d84-ada0-5dd2d0a49c05",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nInsecure API function calls vulnerability in JavaScript refers to the use of API functions that are known to be insecure and can lead to various security issues such as buffer overflow, memory corruption, or data leakage. In the provided code snippet, the `memcpy` function is used, which is a common source of such vulnerabilities. This function copies a certain amount of data from one memory location to another, without checking the size of the destination buffer. If the source data is larger than the destination buffer, it can lead to buffer overflow, potentially allowing an attacker to execute arbitrary code.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to use safer alternatives to `memcpy` that include bounds checking, such as `strncpy` or `memcpy_s` (in C11). Also, always ensure that the destination buffer is large enough to hold the data being copied.\n\n## Source Code Fix Recommendation\n\nReplace the `memcpy` function with a safer alternative. For example:\n\n```javascript\nstrncpy(ad, test_ad[testNumber], aadLen);\n```\n\nOr, if using C11:\n\n```javascript\nmemcpy_s(ad, sizeof(ad), test_ad[testNumber], aadLen);\n```\n\n## Library Dependencies\n\nThe provided code snippet seems to be written in C or C++, not JavaScript. The `memcpy` function is part of the C standard library, so no additional libraries are required.\n\n## References\n\n- [CWE-676: Use of Potentially Dangerous Function](https://cwe.mitre.org/data/definitions/676.html)"
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-interesting-api-calls"
+                ]
+              }
+            },
+            {
+              "id": "glog-116b0058-ccd7-4f81-b124-c2f786616049",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nUnsigned to Signed Conversion Vulnerability is a type of vulnerability that occurs when an unsigned number is converted to a signed number in an unsafe manner. In JavaScript, all numbers are signed, but bitwise operations treat numbers as 32 bits. This can lead to unexpected results when dealing with numbers larger than 2^31 - 1. \n\nIn the provided code snippet, if the variable `u` is large enough, the operation could result in a negative number due to the way JavaScript handles bitwise operations. This could lead to unexpected behavior or potential security issues, depending on how the `keybits` variable is used later in the code.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should ensure that the result of the operation is within the safe range for signed integers in JavaScript. This can be done by checking the value of `u` before performing the operation and handling the case where it is too large separately.\n\n## Source Code Fix Recommendation\n\nHere is a possible fix for the provided code snippet:\n\n```javascript\nif (u > Math.floor((Number.MAX_SAFE_INTEGER - 128) / 64)) {\n    // Handle the case where u is too large\n} else {\n    keybits = 128 + u * 64;\n}\n```\n\nThis code checks if `u` is large enough that the operation would result in a number larger than `Number.MAX_SAFE_INTEGER`, and if so, it handles that case separately. If `u` is not too large, it performs the operation as before.\n\n## Library Dependencies\n\nThe provided code snippet does not appear to have any library dependencies.\n\n## OWASP and CWE Links\n\n- [OWASP Top 10 2017 Category A3: Sensitive Data Exposure](https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure)\n- [CWE-681: Incorrect Conversion between Numeric Types](https://cwe.mitre.org/data/definitions/681.html)"
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-signed-unsigned-conversion"
+                ]
+              }
+            },
+            {
+              "id": "glog-f6911819-f2f2-4e5d-b12e-3352b8d93f90",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nInsecure API function calls vulnerability in JavaScript refers to the use of insecure or deprecated API functions that can lead to security vulnerabilities. In the provided code snippet, the `memcpy` function is used, which is a common source of buffer overflow vulnerabilities. Buffer overflow vulnerabilities occur when more data is written to a buffer than it can handle, leading to the corruption of data, crashes, and code execution.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it's recommended to use secure alternatives to `memcpy` such as `strncpy` or `memcpy_s` which include the size of the destination buffer as a parameter, preventing buffer overflow. It's also important to validate and sanitize all input data to ensure it doesn't exceed the buffer size.\n\n## Source Code Fix Recommendation\n\nReplace the `memcpy` function with a safer alternative. For example:\n\n```javascript\nstrncpy(inputText, test_pt[testNumber], inputLen);\n```\n\n## Library Dependencies\n\nThe provided code snippet seems to be written in C or C++, not JavaScript. The `memcpy` function is part of the C standard library, so no additional libraries are needed.\n\n## OWASP Resources\n\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n- [OWASP API Security](https://owasp.org/www-project-api-security/)\n\n## Common Weakness Enumeration (CWE)\n\n- [CWE-120: Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')](https://cwe.mitre.org/data/definitions/120.html)\n- [CWE-676: Use of Potentially Dangerous Function](https://cwe.mitre.org/data/definitions/676.html)\n\nPlease note that all the provided links are active and accessible by anonymous users."
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-interesting-api-calls"
+                ]
+              }
+            },
+            {
+              "id": "glog-bd797862-37b1-4c92-a31d-486059cb8d07",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nThe \"Identified Issue with C Function (malloc)\" vulnerability in C++ typically arises from improper handling of memory allocation using the `malloc` function. This can lead to various issues such as buffer overflows, memory leaks, or undefined behavior if the allocated memory is not properly managed. Specifically, using `malloc(hash_size)` without ensuring that `hash_size` is correctly calculated and checked can result in insufficient memory allocation, leading to potential security vulnerabilities.\n\n### General Mitigation Advice\n\n1. **Validate Input:** Ensure that the size passed to `malloc` is properly validated and does not lead to integer overflow or underflow.\n2. **Check Return Value:** Always check the return value of `malloc` to ensure that memory allocation was successful.\n3. **Use Safer Alternatives:** Consider using safer alternatives like `new` in C++ or higher-level data structures that manage memory automatically.\n4. **Free Allocated Memory:** Ensure that all allocated memory is properly freed to avoid memory leaks.\n5. **Use Secure Coding Practices:** Follow secure coding guidelines to prevent common vulnerabilities related to memory management.\n\n### Source Code Fix Recommendation\n\n```cpp\n#include <iostream>\n#include <cstdlib> // for malloc and free\n#include <cstring> // for memset\n\nint main() {\n    size_t hash_size = 256; // Example size, ensure this is properly calculated and validated\n    if (hash_size == 0 || hash_size > SIZE_MAX / sizeof(char)) {\n        std::cerr << \"Invalid hash size\" << std::endl;\n        return 1;\n    }\n\n    char* hash_buffer = static_cast<char*>(malloc(hash_size));\n    if (hash_buffer == nullptr) {\n        std::cerr << \"Memory allocation failed\" << std::endl;\n        return 1;\n    }\n\n    // Initialize allocated memory to zero\n    memset(hash_buffer, 0, hash_size);\n\n    // Use the allocated memory for some operation\n    // ...\n\n    // Free the allocated memory\n    free(hash_buffer);\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\n- `<iostream>`: For input and output operations.\n- `<cstdlib>`: For `malloc` and `free` functions.\n- `<cstring>`: For `memset` function.\n\n### OWASP Resources\n\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-119: Improper Restriction of Operations within the Bounds of a Memory Buffer](https://cwe.mitre.org/data/definitions/119.html)\n- [CWE-401: Missing Release of Memory after Effective Lifetime](https://cwe.mitre.org/data/definitions/401.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS161085"
+                ]
+              }
+            },
+            {
+              "id": "glog-20fecaf6-e052-421b-bd45-ee46f17e65b7",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nIn C++ programming, storing sensitive information such as tokens or keys directly in the source code is a common vulnerability. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these secrets. This vulnerability is particularly dangerous in environments where the source code is shared or stored in version control systems, as it increases the risk of accidental exposure.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in the source code repository. Ensure these files are encrypted or access-controlled.\n3. **Secret Management Tools**: Utilize secret management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure only authorized personnel can access sensitive information.\n5. **Code Reviews**: Conduct regular code reviews to identify and remove any hardcoded secrets.\n\n### Source Code Fix Recommendation\n\nBelow is an example of how to securely handle sensitive information in C++ by using environment variables:\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    if (token == nullptr) {\n        std::cerr << \"Error: Environment variable MY_SECRET_TOKEN not set.\" << std::endl;\n        return 1;\n    }\n\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n    // Use the token securely in your application\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code example does not require any additional library dependencies beyond the standard C++ library.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-3f6c762c-da51-43db-8ce1-ce480e5f70ab",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming and other languages. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract sensitive information such as API keys, encryption keys, or tokens. This vulnerability can lead to data breaches, unauthorized transactions, and other security incidents.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and access sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure that only authorized personnel can access sensitive information.\n5. **Encryption**: Encrypt sensitive data both at rest and in transit to add an additional layer of security.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid storing tokens or keys directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    \n    if (token == nullptr) {\n        std::cerr << \"Error: MY_SECRET_TOKEN environment variable is not set.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    // Rest of your application logic\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code does not require any additional library dependencies beyond the standard C++ library.\n\n### OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-b47d2d6a-b9e0-4a25-80c4-66cb69d9bb6f",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract sensitive information. Hardcoding sensitive data like API keys, tokens, or passwords in the source code increases the risk of data breaches and unauthorized access to systems.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and manage sensitive information.\n4. **Encryption**: Encrypt sensitive data if it must be stored in a file, and ensure that the decryption key is stored securely.\n5. **Access Control**: Limit access to sensitive information to only those who need it, and use role-based access control (RBAC) where possible.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid storing tokens or keys directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    \n    if (token == nullptr) {\n        std::cerr << \"Error: MY_SECRET_TOKEN environment variable is not set.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code does not require any additional library dependencies beyond the standard C++ library.\n\n### Relevant Resources\n\n- [OWASP Cheat Sheet: Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)\n- [OWASP Top Ten: A2:2017-Broken Authentication](https://owasp.org/www-project-top-ten/2017/A2_2017-Broken_Authentication)\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-81417f93-03b5-4c60-a69c-0b306f76d41c",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nInsecure API function calls vulnerability in JavaScript refers to the use of insecure or deprecated API functions that can lead to security vulnerabilities. In the provided code snippet, the `memcpy` function is used, which is a common source of vulnerabilities due to its lack of bounds checking. This can lead to buffer overflow vulnerabilities if the size of the destination buffer (`iv`) is smaller than the size of the source buffer (`test_iv[testNumber]`).\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to use secure alternatives to `memcpy` that include bounds checking, such as `strncpy` or `memcpy_s` (in C11). It's also important to always validate the size of the buffers before copying data.\n\n## Source Code Fix Recommendation\n\nHere is a possible fix using `strncpy`:\n\n```javascript\nstrncpy(iv, test_iv[testNumber], ivLen);\niv[ivLen - 1] = '\\0';\n```\n\nIn this code, `strncpy` is used to copy the data and an additional line is added to ensure that the destination buffer is null-terminated.\n\n## Library Dependencies\n\nThe provided code snippet seems to be written in C or C++, not JavaScript. The `memcpy` function is part of the standard C library, so no additional libraries are needed.\n\n## OWASP Resources\n\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n- [OWASP API Security](https://owasp.org/www-project-api-security/)\n\n## Common Weakness Enumeration (CWE)\n\n- [CWE-676: Use of Potentially Dangerous Function](https://cwe.mitre.org/data/definitions/676.html)\n- [CWE-120: Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')](https://cwe.mitre.org/data/definitions/120.html)\n\nPlease note that the links provided are active and accessible to anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-interesting-api-calls"
+                ]
+              }
+            },
+            {
+              "id": "glog-c522e8ac-f8fe-497b-80d2-70d9f1a2b9f1",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nInsecure API function calls vulnerability in JavaScript refers to the use of insecure or deprecated API functions that can lead to security vulnerabilities. In the provided code snippet, the `malloc` function is used, which is a C language function and not a JavaScript function. This function is used to allocate a block of memory and it can lead to vulnerabilities if not used properly, such as buffer overflow.\n\n## Mitigation Advice\n\nIn JavaScript, memory management is handled automatically, so there's no need to use functions like `malloc`. If you're dealing with large amounts of data, consider using typed arrays or other data structures that are designed to handle large amounts of data efficiently.\n\n## Code Fix Recommendation\n\nSince `malloc` is not a JavaScript function, the code needs to be rewritten in a way that is appropriate for JavaScript. Here's an example of how you might handle user input in a secure way in JavaScript:\n\n```javascript\nlet inputText = new Array(inputLen);\n```\n\nIn this example, `new Array(inputLen)` creates a new array with a length of `inputLen`. This is a more appropriate way to handle memory allocation in JavaScript.\n\n## Library Dependencies\n\nSince `malloc` is not a JavaScript function, there are no library dependencies required by the code example.\n\n## OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP API Security](https://owasp.org/www-project-api-security/)\n\n## Common Weakness Enumeration (CWE)\n\n- [CWE-676: Use of Potentially Dangerous Function](https://cwe.mitre.org/data/definitions/676.html)\n\nPlease note that all the links provided are active and accessible by anonymous users."
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-interesting-api-calls"
+                ]
+              }
+            },
+            {
+              "id": "glog-7ff2c877-2d7e-43d5-86cb-ca51939ebc72",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nEmbedding tokens or keys directly in source code is a common security vulnerability in C++ programming and other languages. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract these sensitive values. This vulnerability is particularly dangerous when the code is stored in version control systems or shared in public repositories.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information like tokens or keys in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in the source code repository to store sensitive data. Ensure these files are secured and access is restricted.\n3. **Secrets Management Tools**: Utilize secrets management tools such as HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and manage sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure that only authorized personnel can access sensitive information.\n5. **Code Reviews**: Conduct regular code reviews to identify and remove any hardcoded sensitive information.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid embedding a token directly in the source code by using environment variables:\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    \n    if (token == nullptr) {\n        std::cerr << \"Error: Environment variable MY_SECRET_TOKEN is not set.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code example does not require any additional library dependencies beyond the standard C++ library.\n\n### Relevant OWASP Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-6ef075f9-8f41-4a02-bf0c-94208ff414d2",
+              "help": {
+                "text": "",
+                "markdown": "### Description\n\nStoring tokens or keys directly in source code is a common security vulnerability in C++ programming. This practice can lead to unauthorized access if the source code is exposed, as attackers can easily extract sensitive information. Hardcoding sensitive data like API keys, tokens, or passwords in the source code increases the risk of data breaches and unauthorized access to systems.\n\n### General Mitigation Advice\n\n1. **Environment Variables**: Store sensitive information in environment variables instead of hardcoding them in the source code.\n2. **Configuration Files**: Use configuration files that are not included in version control systems to store sensitive data.\n3. **Secrets Management Tools**: Utilize secrets management tools like HashiCorp Vault, AWS Secrets Manager, or Azure Key Vault to securely store and manage sensitive information.\n4. **Access Control**: Implement strict access control measures to ensure that only authorized personnel can access sensitive information.\n5. **Encryption**: Encrypt sensitive data both at rest and in transit to add an additional layer of security.\n\n### Source Code Fix Recommendation\n\nBelow is a C++ code example demonstrating how to avoid storing tokens or keys directly in the source code by using environment variables.\n\n```cpp\n#include <iostream>\n#include <cstdlib>\n\nint main() {\n    // Retrieve the token from an environment variable\n    const char* token = std::getenv(\"MY_SECRET_TOKEN\");\n    \n    if (token == nullptr) {\n        std::cerr << \"Error: Environment variable MY_SECRET_TOKEN is not set.\" << std::endl;\n        return 1;\n    }\n\n    // Use the token securely in your application\n    std::cout << \"Token retrieved successfully.\" << std::endl;\n\n    return 0;\n}\n```\n\n### Library Dependencies\n\nThe above code example does not require any additional library dependencies beyond the standard C++ library.\n\n### Relevant Resources\n\n- [OWASP Top Ten](https://owasp.org/www-project-top-ten/)\n- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)\n\n### Common Weakness Enumeration (CWE)\n\n- [CWE-798: Use of Hard-coded Credentials](https://cwe.mitre.org/data/definitions/798.html)"
+              },
+              "properties": {
+                "tags": [
+                  "DS173237"
+                ]
+              }
+            },
+            {
+              "id": "glog-cabf1865-8416-4689-8cf9-a1d1a57a6e7b",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nInsecure API function calls vulnerability in JavaScript refers to the use of insecure or deprecated API functions that can lead to security vulnerabilities. In the provided code snippet, the `malloc` function is used, which is a C standard library function, not a JavaScript function. This function is used to allocate a block of memory and it returns a pointer to the beginning of the block. The size of the block is specified in bytes. If the space is insufficient, allocation fails and it returns NULL.\n\nThe use of `malloc` can lead to vulnerabilities such as buffer overflow if the allocated memory is not properly managed. This can allow an attacker to execute arbitrary code or cause a Denial of Service (DoS).\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to use secure API functions and avoid using deprecated or insecure functions. In JavaScript, memory management is handled automatically, so there is no need to use functions like `malloc`.\n\n## Source Code Fix Recommendation\n\nSince `malloc` is not a JavaScript function, the code should be rewritten to use JavaScript's built-in functions and features. For example, if `inputLen` is the length of an input string, you can simply declare a new string or array with that length.\n\n```javascript\nlet cipherText = new Array(inputLen);\n```\n\n## Library Dependencies\n\nThe provided code snippet does not require any library dependencies as it is not valid JavaScript code.\n\n## OWASP and CWE Resources\n\n- [OWASP - Buffer Overflow](https://owasp.org/www-community/vulnerabilities/Buffer_Overflow)\n- [CWE - CWE-120: Buffer Copy without Checking Size of Input ('Classic Buffer Overflow')](https://cwe.mitre.org/data/definitions/120.html)\n- [CWE - CWE-676: Use of Potentially Dangerous Function](https://cwe.mitre.org/data/definitions/676.html)"
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.raptor-interesting-api-calls"
+                ]
+              }
+            }
+          ],
+          "language": "en-US",
+          "contents": [
+            "localizedData",
+            "nonLocalizedData"
+          ],
+          "isComprehensive": false
+        }
+      },
+      "language": "en-US",
+      "results": [
+        {
+          "ruleId": "glog-3515e45e-d77f-4dd9-97fb-189fb2e0e4ed",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "\"Detection of exec Usage\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "scripts/python/ensure_copyrights.py"
+                },
+                "region": {
+                  "startLine": 276,
+                  "startColumn": 21,
+                  "endLine": 276,
+                  "endColumn": 35,
+                  "snippet": {
+                    "text": "                    exec(next_arg)\n"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 275,
+                  "endLine": 277,
+                  "snippet": {
+                    "text": "                    next_arg = sys.argv[i]\n                    exec(next_arg)\n                else:\n"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_severity": "MEDIUM",
+            "issue_confidence": "HIGH"
+          }
+        },
+        {
+          "ruleId": "glog-3eaa3b41-87de-424e-8d18-e4daa07f3109",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "\"Detection of exec Usage\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "scripts/python/ensure_copyrights.py"
+                },
+                "region": {
+                  "startLine": 282,
+                  "startColumn": 17,
+                  "endLine": 282,
+                  "endColumn": 23,
+                  "snippet": {
+                    "text": "                exec()\n"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 281,
+                  "endLine": 283,
+                  "snippet": {
+                    "text": "            else:\n                exec()\n        else:\n"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_severity": "MEDIUM",
+            "issue_confidence": "HIGH"
+          }
+        },
+        {
+          "ruleId": "glog-0a0fc16e-d2fe-4885-a2c2-95e1a5b13fc1",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Invalid input."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-ccm.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 91,
+                  "startColumn": 25,
+                  "endLine": 91,
+                  "endColumn": 64,
+                  "snippet": {
+                    "text": "    handle.ch_context = malloc(alcp_cipher_aead_context_size());"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "1f4103651e5072a7e42813a7df7c56ca02483cdc28841e4fd1ea2946347d19c91047c89940540ebee1f071564073057a97adbad5f36ccbd8c847fa45283cf582_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-ea624b03-c610-44bb-b1ad-d5622880567c",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Stack Buffer Overflow Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bench/rsa/include/benchmarks_rsa.hh",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 141,
+                  "startColumn": 5,
+                  "endLine": 141,
+                  "endColumn": 54,
+                  "snippet": {
+                    "text": "    memset(digest, 0, rb->m_hash_len * sizeof(Uint8));"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "0e054af1547bddc295738c2fcaa78cdddb9eba10a8f1677c501e50691394f4420b6c0103859866658c9b856beb0cd69443c12e5c7da25ece539011566ef591b1_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-9628f537-8a83-41e3-93b1-69d9d0639a71",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Stack Buffer Overflow Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bench/digest/include/benchmarks_digest.hh",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 80,
+                  "startColumn": 5,
+                  "endLine": 80,
+                  "endColumn": 57,
+                  "snippet": {
+                    "text": "    memset(digest, 0, data.m_digest_len * sizeof(Uint8));"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "c34423170fda9b50e4650e82ff618e51656a69198f4ebfd56db0e78fc9ce5302f16b87b2e8bab10ce3d1756154be3ec54506ce143a7bbd66c66079889a480b4e_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-cd31712f-24f8-4ec8-9785-7ac81044f5ae",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Identifying and Tracing Insecure API Function Calls Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bench/cipher/bench_cipher.cc",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 136,
+                  "startColumn": 13,
+                  "endLine": 136,
+                  "endColumn": 39,
+                  "snippet": {
+                    "text": "            memcpy(iv, data.m_tag, 16);"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "4fbad8bd16b92e4c90974bb02c9e78badfb8f731f34bdc9faf2642242bbbb3c3c05587011dbd29694b321f3c98823283a43605482d1afc3afeef2683f7f26b66_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-3051f931-7439-4763-a5ad-b55d53436abe",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Vulnerability due to Assertion-Based Input Validation in Non-Debug Builds"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-ccm.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 295,
+                  "startColumn": 5,
+                  "endLine": 295,
+                  "endColumn": 61,
+                  "snippet": {
+                    "text": "    assert(sizeof(sample_plaintxt) <= sizeof(sample_output));"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "725ce09bf813f8940b82697ced5c1a8fed31486f42be0cf717e3707d6bce66d1e6ec4a67ba658ed093c3da11f7eb9bf499e61061187b191b64088c2d5387b67c_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-cf4364a2-3314-43ad-8026-ea66336ea6fc",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Invalid input."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-cfb.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 87,
+                  "startColumn": 25,
+                  "endLine": 87,
+                  "endColumn": 59,
+                  "snippet": {
+                    "text": "    handle.ch_context = malloc(alcp_cipher_context_size());"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "39515b62a46ce20ca41b2efd0d9c5aa22ad88c9c053b3c2f5cd2000d1a4ac43411ccd4158e11eb8b993de3305ef95f1ececa5fb2c546ae4971ae765de153322c_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-4294dc48-7586-4647-993f-5c6e6820c498",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Vulnerability due to Assertion-Based Input Validation in Non-Debug Builds"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-cfb.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 225,
+                  "startColumn": 5,
+                  "endLine": 225,
+                  "endColumn": 61,
+                  "snippet": {
+                    "text": "    assert(sizeof(sample_plaintxt) <= sizeof(sample_output));"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "5aae3e8f95a68334d836cc019f8be2f5c09b49fc8e32fde17f1f4992ae448866a850deedc7728750d41fd095180b4337ba6712cc906470031897099cd5d97304_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-1864116b-df36-4bf8-9bd3-b5c586ac8812",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Invalid input."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-gcm.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 310,
+                  "startColumn": 25,
+                  "endLine": 310,
+                  "endColumn": 64,
+                  "snippet": {
+                    "text": "    handle.ch_context = malloc(alcp_cipher_aead_context_size());"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "a8ee1d4fe0108d1a2526f8a3305ef20eec7154067705e0b018f5808f50574e413e81a4854762343b65a124f9ab5b7b82f7970925511befab9adb8b80245dccd7_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-e8c8e49f-8711-4447-9b11-4a8ab2b07c24",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "\"Detected Issue with C Function (malloc)\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/rng/drbg-test.c"
+                },
+                "region": {
+                  "startLine": 62,
+                  "startColumn": 28,
+                  "endLine": 62,
+                  "endColumn": 69,
+                  "charOffset": 2395,
+                  "charLength": 41,
+                  "snippet": {
+                    "text": "malloc(alcp_drbg_context_size(&drbg_info)",
+                    "rendered": {
+                      "text": "malloc(alcp_drbg_context_size(&drbg_info)",
+                      "markdown": "`malloc(alcp_drbg_context_size(&drbg_info)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If the value provided to malloc is the result of unsafe integer math, it can result in an exploitable condition. "
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "examples/rng/drbg-test.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 2395,
+                        "charLength": 41
+                      },
+                      "insertedContent": {
+                        "text": "calloc(<number of elements>, <size of each element>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-8becf13f-efe1-4257-8252-e3f99fafbf8d",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Unsigned to Signed Conversion Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-cfb.cc",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 52,
+                  "startColumn": 5,
+                  "endLine": 52,
+                  "endColumn": 35,
+                  "snippet": {
+                    "text": "    memset(inputText, 10, dataLen);"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "47ad10fb8d36590af1da9ea0534b97303a8cb34d1a39c52ac8e29a4be2481e3dcd380dd1cb417166bf35c8764764372e02df853cfca956f02daf36880c1be329_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-f69836b0-a5b4-4aa1-94df-5175b64a7650",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "\"Detected Issue with C Function (malloc)\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/rng/hmac_drbg-demo.c"
+                },
+                "region": {
+                  "startLine": 67,
+                  "startColumn": 28,
+                  "endLine": 67,
+                  "endColumn": 69,
+                  "charOffset": 2777,
+                  "charLength": 41,
+                  "snippet": {
+                    "text": "malloc(alcp_drbg_context_size(&drbg_info)",
+                    "rendered": {
+                      "text": "malloc(alcp_drbg_context_size(&drbg_info)",
+                      "markdown": "`malloc(alcp_drbg_context_size(&drbg_info)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If the value provided to malloc is the result of unsafe integer math, it can result in an exploitable condition. "
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "examples/rng/hmac_drbg-demo.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 2777,
+                        "charLength": 41
+                      },
+                      "insertedContent": {
+                        "text": "calloc(<number of elements>, <size of each element>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-892d1a62-16b6-4c43-acd2-c92b11f2b039",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Identifying and Tracing Insecure API Function Calls Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-gcm.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 444,
+                  "startColumn": 18,
+                  "endLine": 444,
+                  "endColumn": 34,
+                  "snippet": {
+                    "text": "    outputText = malloc(inputLen);"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "a8ee1d4fe0108d1a2526f8a3305ef20eec7154067705e0b018f5808f50574e413e81a4854762343b65a124f9ab5b7b82f7970925511befab9adb8b80245dccd7_1"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-8c289282-b03f-4c64-9fdb-c17d07fe3953",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Unsigned to Signed Conversion Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-gcm.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 456,
+                  "startColumn": 5,
+                  "endLine": 456,
+                  "endColumn": 30,
+                  "snippet": {
+                    "text": "    memset(iv, 10, IVLEN_MAX);"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "1ac8d9a0a1c8810ecfdc3dea83984fb291be81d4ac481e78cda02772b65b62f7d040d23c7bf12263a4b1de256337e54294c589c4fb73720b6b22cd6e52ef6e5d_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-0b6cf935-1006-4efe-92f9-4f673f23f472",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Unsigned to Signed Conversion Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-gcm.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 441,
+                  "startColumn": 5,
+                  "endLine": 441,
+                  "endColumn": 23,
+                  "snippet": {
+                    "text": "    memset(key, 0, 32);"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "1e6a08af31b441d268036c56d6dffe703e184fdca5f7488cbf962b2c4aa2a8e4d914a700914f29bbaf3d5d56817475f6dc0a2fb840a5ab445d09d70559dafd29_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-c2b13421-81d6-4de2-b8d2-7bbbf56b46fd",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Unsigned to Signed Conversion Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-gcm.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 458,
+                  "startColumn": 5,
+                  "endLine": 458,
+                  "endColumn": 31,
+                  "snippet": {
+                    "text": "    memset(tag, 0, TAGLEN_MAX);"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "aae84b5d3eed4fbe60141a4217d323612935e36dc2711e67d26a66a8efd019b29fb690a38cd33a1a90d01b461553c8827964f285a03bf8ecfd29487a38278a5d_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-9eae5cba-82f8-4977-8bd5-33508ff86ca4",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "\"Detected Issue with C Function (malloc)\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/rng/ctr_drbg-demo.c"
+                },
+                "region": {
+                  "startLine": 69,
+                  "startColumn": 28,
+                  "endLine": 69,
+                  "endColumn": 69,
+                  "charOffset": 2857,
+                  "charLength": 41,
+                  "snippet": {
+                    "text": "malloc(alcp_drbg_context_size(&drbg_info)",
+                    "rendered": {
+                      "text": "malloc(alcp_drbg_context_size(&drbg_info)",
+                      "markdown": "`malloc(alcp_drbg_context_size(&drbg_info)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If the value provided to malloc is the result of unsafe integer math, it can result in an exploitable condition. "
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "examples/rng/ctr_drbg-demo.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 2857,
+                        "charLength": 41
+                      },
+                      "insertedContent": {
+                        "text": "calloc(<number of elements>, <size of each element>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-5333f51a-7680-4655-97dc-5457b62c169b",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "\"Detected Issue with C Function (malloc)\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/shake_128_example.c"
+                },
+                "region": {
+                  "startLine": 286,
+                  "startColumn": 27,
+                  "endLine": 286,
+                  "endColumn": 52,
+                  "charOffset": 10369,
+                  "charLength": 25,
+                  "snippet": {
+                    "text": "malloc(hash_size * 2 + 1)",
+                    "rendered": {
+                      "text": "malloc(hash_size * 2 + 1)",
+                      "markdown": "`malloc(hash_size * 2 + 1)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If the value provided to malloc is the result of unsafe integer math, it can result in an exploitable condition. "
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "examples/digest/shake_128_example.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 10369,
+                        "charLength": 25
+                      },
+                      "insertedContent": {
+                        "text": "calloc(<number of elements>, <size of each element>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-1329143a-846b-4d74-b300-eefcdba38788",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Software Error Message Exposure Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-gcm.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 60,
+                  "startColumn": 13,
+                  "endLine": 60,
+                  "endColumn": 37,
+                  "snippet": {
+                    "text": "            printf(\" %2x\", *(I + x));"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "4db3c921a9b18a6e4f646fc002d3cdae5a765f1ce0d49978234a055c73cc46f529ffcb9511b7125294c67842e75e8e823f723a43ca5d24b1de4e21aa64aa30b1_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-89a35db4-7643-49d9-8a1f-a4e1cf64ca51",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "\"Detected Issue with C Function (malloc)\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/rng/rng-demo.c"
+                },
+                "region": {
+                  "startLine": 118,
+                  "startColumn": 37,
+                  "endLine": 118,
+                  "endColumn": 56,
+                  "charOffset": 4383,
+                  "charLength": 19,
+                  "snippet": {
+                    "text": "malloc(sizeof(char)",
+                    "rendered": {
+                      "text": "malloc(sizeof(char)",
+                      "markdown": "`malloc(sizeof(char)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If the value provided to malloc is the result of unsafe integer math, it can result in an exploitable condition. "
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "examples/rng/rng-demo.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 4383,
+                        "charLength": 19
+                      },
+                      "insertedContent": {
+                        "text": "calloc(<number of elements>, <size of each element>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-01adacfa-5e25-4545-b6e9-1142c37101f7",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "\"Detected Issue with C Function (malloc)\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/rng/rng-demo.c"
+                },
+                "region": {
+                  "startLine": 85,
+                  "startColumn": 28,
+                  "endLine": 85,
+                  "endColumn": 67,
+                  "charOffset": 3345,
+                  "charLength": 39,
+                  "snippet": {
+                    "text": "malloc(alcp_rng_context_size(&rng_info)",
+                    "rendered": {
+                      "text": "malloc(alcp_rng_context_size(&rng_info)",
+                      "markdown": "`malloc(alcp_rng_context_size(&rng_info)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If the value provided to malloc is the result of unsafe integer math, it can result in an exploitable condition. "
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "examples/rng/rng-demo.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 3345,
+                        "charLength": 39
+                      },
+                      "insertedContent": {
+                        "text": "calloc(<number of elements>, <size of each element>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-53c1bde0-3c5d-43ff-a906-95e88bf93ddc",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Avoid storing tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/shake_128_example.c"
+                },
+                "region": {
+                  "startLine": 259,
+                  "startColumn": 10,
+                  "endLine": 259,
+                  "endColumn": 80,
+                  "charOffset": 9619,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"ff347bfb8075c075505e55ec8bac2da1414ba98b77085d2a198b251278d92025b78f\"",
+                    "rendered": {
+                      "text": "\"ff347bfb8075c075505e55ec8bac2da1414ba98b77085d2a198b251278d92025b78f\"",
+                      "markdown": "`\"ff347bfb8075c075505e55ec8bac2da1414ba98b77085d2a198b251278d92025b78f\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-3621e719-0980-405e-a673-3f2783b66845",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Identifying and Tracing Insecure API Function Calls Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-gcm.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 467,
+                  "startColumn": 5,
+                  "endLine": 467,
+                  "endColumn": 42,
+                  "snippet": {
+                    "text": "    memcpy(key, test_key[testNumber], 16);"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "370b0d8ccc4d8dbe082cc13426a0e1b5359438dafe851a4c250297dc2b77ac370e325b09bf2503d0965832f5eeb7a8a860a3c6f75b5b46b512219cb0fc6ba94f_1"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-69ebcc14-bc11-4243-809a-20d0e0e44628",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "\"Detected Issue with C Function (strlen)\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/shake_128_example.c"
+                },
+                "region": {
+                  "startLine": 293,
+                  "startColumn": 24,
+                  "endLine": 293,
+                  "endColumn": 44,
+                  "charOffset": 10584,
+                  "charLength": 20,
+                  "snippet": {
+                    "text": "strlen((const char*)",
+                    "rendered": {
+                      "text": "strlen((const char*)",
+                      "markdown": "`strlen((const char*)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "examples/digest/shake_128_example.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 10584,
+                        "charLength": 20
+                      },
+                      "insertedContent": {
+                        "text": "strlen_s((const char*, <size of (const char*>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "description": {
+                "text": "If a string is missing a null terminator, strlen will read past the end of the buffer"
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "examples/digest/shake_128_example.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 10584,
+                        "charLength": 20
+                      },
+                      "insertedContent": {
+                        "text": "strnlen((const char*, <size of (const char*>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-a08de77f-58c0-47a8-a1d3-6faf8bcce991",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Unsigned to Signed Conversion Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-gcm.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 457,
+                  "startColumn": 5,
+                  "endLine": 457,
+                  "endColumn": 29,
+                  "snippet": {
+                    "text": "    memset(ad, 0, ADLEN_MAX);"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "58b915e370969cb5081aa01cc118556f1d3f95142b844f81e5530330f1bcafe2b2d63f5cedbaa9b43f638c31256c8ed137080c3a10c4c5b5d6443406b1eed2f5_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-b6fc335d-6706-4d84-ada0-5dd2d0a49c05",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Identifying and Tracing Insecure API Function Calls Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-gcm.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 469,
+                  "startColumn": 5,
+                  "endLine": 469,
+                  "endColumn": 44,
+                  "snippet": {
+                    "text": "    memcpy(ad, test_ad[testNumber], aadLen);"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "370b0d8ccc4d8dbe082cc13426a0e1b5359438dafe851a4c250297dc2b77ac370e325b09bf2503d0965832f5eeb7a8a860a3c6f75b5b46b512219cb0fc6ba94f_3"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-116b0058-ccd7-4f81-b124-c2f786616049",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Unsigned to Signed Conversion Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-gcm.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 463,
+                  "startColumn": 5,
+                  "endLine": 463,
+                  "endColumn": 27,
+                  "snippet": {
+                    "text": "    keybits = 128 + u * 64;"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "67565093c88c5c62b8fabd7e70c675a7b647bff02416cd9f66503fc8063fda4a4fc8b90af3fea146931e1c0a9f734a2599f671317b5a5a90ff00bf3288c0b814_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-f6911819-f2f2-4e5d-b12e-3352b8d93f90",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Identifying and Tracing Insecure API Function Calls Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-gcm.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 466,
+                  "startColumn": 5,
+                  "endLine": 466,
+                  "endColumn": 53,
+                  "snippet": {
+                    "text": "    memcpy(inputText, test_pt[testNumber], inputLen);"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "370b0d8ccc4d8dbe082cc13426a0e1b5359438dafe851a4c250297dc2b77ac370e325b09bf2503d0965832f5eeb7a8a860a3c6f75b5b46b512219cb0fc6ba94f_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-bd797862-37b1-4c92-a31d-486059cb8d07",
+          "kind": "fail",
+          "level": "note",
+          "message": {
+            "text": "\"Identified Issue with C Function (malloc)\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/shake_128_example.c"
+                },
+                "region": {
+                  "startLine": 285,
+                  "startColumn": 27,
+                  "endLine": 285,
+                  "endColumn": 44,
+                  "charOffset": 10323,
+                  "charLength": 17,
+                  "snippet": {
+                    "text": "malloc(hash_size)",
+                    "rendered": {
+                      "text": "malloc(hash_size)",
+                      "markdown": "`malloc(hash_size)`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "fixes": [
+            {
+              "description": {
+                "text": "If the value provided to malloc is the result of unsafe integer math, it can result in an exploitable condition. "
+              },
+              "artifactChanges": [
+                {
+                  "artifactLocation": {
+                    "uri": "examples/digest/shake_128_example.c"
+                  },
+                  "replacements": [
+                    {
+                      "deletedRegion": {
+                        "charOffset": 10323,
+                        "charLength": 17
+                      },
+                      "insertedContent": {
+                        "text": "calloc(<number of elements>, <size of each element>)"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "BestPractice",
+            "DevSkimConfidence": "High",
+            "tags": [
+              "API.DangerousAPI.ProblematicFunction"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-20fecaf6-e052-421b-bd45-ee46f17e65b7",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "\"Avoid Storing Tokens or Keys in Source Code\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/shake_128_example.c"
+                },
+                "region": {
+                  "startLine": 258,
+                  "startColumn": 10,
+                  "endLine": 258,
+                  "endColumn": 80,
+                  "charOffset": 9538,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"712b9dba3ef55fd89b8208c3598329e5a37185b88b907641cbe157e4f5584aa17f3a\"",
+                    "rendered": {
+                      "text": "\"712b9dba3ef55fd89b8208c3598329e5a37185b88b907641cbe157e4f5584aa17f3a\"",
+                      "markdown": "`\"712b9dba3ef55fd89b8208c3598329e5a37185b88b907641cbe157e4f5584aa17f3a\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-3f6c762c-da51-43db-8ce1-ce480e5f70ab",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Avoid Storing Tokens or Keys in Source Code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/shake_128_example.c"
+                },
+                "region": {
+                  "startLine": 247,
+                  "startColumn": 10,
+                  "endLine": 247,
+                  "endColumn": 80,
+                  "charOffset": 9024,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"71d510d3993caa7ebb13deb9d31307a88fc89d49954ecee04ef2f3bc694110507e81\"",
+                    "rendered": {
+                      "text": "\"71d510d3993caa7ebb13deb9d31307a88fc89d49954ecee04ef2f3bc694110507e81\"",
+                      "markdown": "`\"71d510d3993caa7ebb13deb9d31307a88fc89d49954ecee04ef2f3bc694110507e81\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-b47d2d6a-b9e0-4a25-80c4-66cb69d9bb6f",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Avoid Storing Tokens or Keys in Source Code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/shake_128_example.c"
+                },
+                "region": {
+                  "startLine": 257,
+                  "startColumn": 10,
+                  "endLine": 257,
+                  "endColumn": 80,
+                  "charOffset": 9457,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"094635c663fcc852e21ff02e90c9fda20bb0cf3d04d40573de50ac2fa0fbc9fa1dbd\"",
+                    "rendered": {
+                      "text": "\"094635c663fcc852e21ff02e90c9fda20bb0cf3d04d40573de50ac2fa0fbc9fa1dbd\"",
+                      "markdown": "`\"094635c663fcc852e21ff02e90c9fda20bb0cf3d04d40573de50ac2fa0fbc9fa1dbd\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-81417f93-03b5-4c60-a69c-0b306f76d41c",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Identifying and Tracing Insecure API Function Calls Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-gcm.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 468,
+                  "startColumn": 5,
+                  "endLine": 468,
+                  "endColumn": 43,
+                  "snippet": {
+                    "text": "    memcpy(iv, test_iv[testNumber], ivLen);"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "370b0d8ccc4d8dbe082cc13426a0e1b5359438dafe851a4c250297dc2b77ac370e325b09bf2503d0965832f5eeb7a8a860a3c6f75b5b46b512219cb0fc6ba94f_2"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-c522e8ac-f8fe-497b-80d2-70d9f1a2b9f1",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Identifying and Tracing Insecure API Function Calls Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-gcm.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 571,
+                  "startColumn": 21,
+                  "endLine": 571,
+                  "endColumn": 37,
+                  "snippet": {
+                    "text": "        inputText = malloc(inputLen);"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "a8ee1d4fe0108d1a2526f8a3305ef20eec7154067705e0b018f5808f50574e413e81a4854762343b65a124f9ab5b7b82f7970925511befab9adb8b80245dccd7_2"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-7ff2c877-2d7e-43d5-86cb-ca51939ebc72",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Avoid embedding tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/shake_128_example.c"
+                },
+                "region": {
+                  "startLine": 256,
+                  "startColumn": 10,
+                  "endLine": 256,
+                  "endColumn": 80,
+                  "charOffset": 9376,
+                  "charLength": 70,
+                  "snippet": {
+                    "text": "\"1ca64e3267d1ae6197d91b853c1203ba96e788ff85692bdf4382c74d3b2de4f86617\"",
+                    "rendered": {
+                      "text": "\"1ca64e3267d1ae6197d91b853c1203ba96e788ff85692bdf4382c74d3b2de4f86617\"",
+                      "markdown": "`\"1ca64e3267d1ae6197d91b853c1203ba96e788ff85692bdf4382c74d3b2de4f86617\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-6ef075f9-8f41-4a02-bf0c-94208ff414d2",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Avoid storing tokens or keys in source code."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/digest/shake_128_example.c"
+                },
+                "region": {
+                  "startLine": 238,
+                  "startColumn": 10,
+                  "endLine": 238,
+                  "endColumn": 68,
+                  "charOffset": 8626,
+                  "charLength": 58,
+                  "snippet": {
+                    "text": "\"417c19d9a0d8bffd762ebad68c7b5c44f49826fe6aa009d2ee7c89cf\"",
+                    "rendered": {
+                      "text": "\"417c19d9a0d8bffd762ebad68c7b5c44f49826fe6aa009d2ee7c89cf\"",
+                      "markdown": "`\"417c19d9a0d8bffd762ebad68c7b5c44f49826fe6aa009d2ee7c89cf\"`"
+                    }
+                  },
+                  "sourceLanguage": "c"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "DevSkimSeverity": "Important",
+            "DevSkimConfidence": "Medium",
+            "tags": [
+              "Implementation.Privacy.Token"
+            ]
+          }
+        },
+        {
+          "ruleId": "glog-cabf1865-8416-4689-8cf9-a1d1a57a6e7b",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Identifying and Tracing Insecure API Function Calls Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/cipher/aes-gcm.c",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 575,
+                  "startColumn": 22,
+                  "endLine": 575,
+                  "endColumn": 38,
+                  "snippet": {
+                    "text": "        cipherText = malloc(inputLen);"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "a8ee1d4fe0108d1a2526f8a3305ef20eec7154067705e0b018f5808f50574e413e81a4854762343b65a124f9ab5b7b82f7970925511befab9adb8b80245dccd7_3"
+          },
+          "properties": {}
+        }
+      ],
+      "newlineSequences": [
+        "\r\n",
+        "\n"
+      ]
+    }
+  ]
+}
